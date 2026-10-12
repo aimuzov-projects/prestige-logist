@@ -4,9 +4,9 @@
 	import Upload from '@lucide/svelte/icons/upload'
 
 	import type { OrderSummary } from '#shared/request.ts'
-	import Alert from '#frontend/components/ui/Alert.svelte'
-	import Button from '#frontend/components/ui/Button.svelte'
-	import Card from '#frontend/components/ui/Card.svelte'
+	import Alert from '#frontend/components/ui/alert.svelte'
+	import Button from '#frontend/components/ui/button.svelte'
+	import Card from '#frontend/components/ui/card.svelte'
 	import { wizard } from '#frontend/lib/wizard.svelte.ts'
 
 	const SUMMARY_LABELS: Array<[keyof OrderSummary, string]> = [

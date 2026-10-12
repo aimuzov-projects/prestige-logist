@@ -6,8 +6,8 @@
 
 	import { addressToText, type FiasAddress } from '#shared/address.ts'
 	import type { AddressSuggestion } from '#shared/api.ts'
-	import Badge from '#frontend/components/ui/Badge.svelte'
-	import Button from '#frontend/components/ui/Button.svelte'
+	import Badge from '#frontend/components/ui/badge.svelte'
+	import Button from '#frontend/components/ui/button.svelte'
 	import { api, later } from '#frontend/lib/api.ts'
 	import { wizard, type AddressTarget } from '#frontend/lib/wizard.svelte.ts'
 
