@@ -1,0 +1,123 @@
+:root {
+	--font-sans: system-ui, sans-serif;
+	--font-mono: ui-monospace, sfmono-regular, menlo, monospace;
+
+	--container: 56rem;
+	--gutter: 1.5rem;
+	--radius: 0.625rem;
+
+	--bg: oklch(100% 0 0);
+	/* Полоса с заголовком и вкладками: чуть темнее белого поля формы под ней. */
+	--header: oklch(98% 0 0);
+	--fg: oklch(14.5% 0 0);
+	--muted: oklch(55.6% 0 0);
+	--surface: oklch(97% 0 0);
+	--border: oklch(92.2% 0 0);
+	--border-strong: oklch(83% 0 0);
+	--primary: oklch(20.5% 0 0);
+	--primary-fg: oklch(98.5% 0 0);
+	--ring: oklch(70.8% 0 0);
+	--danger: oklch(57.7% 0.245 27.325);
+	--danger-bg: oklch(97% 0.015 27);
+	--success: oklch(59.6% 0.145 163.225);
+	--success-bg: oklch(95% 0.05 163);
+	--warning: oklch(55.5% 0.163 48.998);
+	--warning-bg: oklch(96.2% 0.059 95.617);
+
+	color-scheme: light;
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+html {
+	font-family: var(--font-sans);
+	-webkit-font-smoothing: antialiased;
+}
+
+body {
+	display: flex;
+	flex-direction: column;
+	min-height: 100svh;
+	margin: 0;
+	font-size: 0.875rem;
+	line-height: 1.5;
+	color: var(--fg);
+	background: var(--bg);
+}
+
+h1,
+h2,
+h3,
+p,
+dl,
+dd,
+ul {
+	margin: 0;
+}
+
+ul {
+	padding: 0;
+	list-style: none;
+}
+
+button,
+input {
+	font: inherit;
+	color: inherit;
+}
+
+:focus-visible {
+	outline: 2px solid var(--ring);
+	outline-offset: 2px;
+}
+
+.container {
+	width: 100%;
+	max-width: calc(var(--container) + var(--gutter) * 2);
+	margin-inline: auto;
+	padding-inline: var(--gutter);
+}
+
+/* Поле ввода одно на всю форму, отдельный компонент ради него не нужен. */
+.input {
+	width: 100%;
+	height: 2.25rem;
+	padding: 0 0.75rem;
+	border: 1px solid var(--border);
+	border-radius: calc(var(--radius) * 0.8);
+	background: var(--bg);
+	transition: border-color 0.15s;
+
+	&:focus-visible {
+		border-color: var(--ring);
+		outline: 3px solid color-mix(in oklch, var(--ring) 50%, transparent);
+		outline-offset: 0;
+	}
+
+	&::placeholder {
+		color: var(--muted);
+	}
+}
+
+.hint {
+	font-size: 0.75rem;
+	color: var(--muted);
+}
+
+.mono {
+	font-family: var(--font-mono);
+}
+
+.spin {
+	animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+	to {
+		transform: rotate(360deg);
+	}
+}

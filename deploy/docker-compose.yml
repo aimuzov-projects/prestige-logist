@@ -1,5 +1,5 @@
-# Сайт на сервере projects. Порты 80/443 держит общий Caddy из aimuzov-projects/infra-server,
-# он проксирует домен сюда по сети edge.
+# Конвертер на сервере projects. Порты 80/443 держит общий Caddy из aimuzov-projects/infra-server,
+# он проксирует домен сюда по сети edge, а /api/* -- сервису API.
 
 name: prestige-logist
 
@@ -21,7 +21,29 @@ services:
       - edge
     logging: *logging
 
-# Переменные сборки лежат в /srv/prestige-logist/.env, образец в .env.example.
+  # Токен dadata лежит в /srv/prestige-logist/.env, образец в .env.example.
+  # VPN не нужен: dadata и Контур отвечают из РФ.
+  api:
+    build:
+      context: ..
+      dockerfile: src/backend/Dockerfile
+    image: prestige-logist-api
+    container_name: prestige-logist-api
+    restart: unless-stopped
+    env_file: ../.env
+    environment:
+      # Дата и время формирования в заявке -- московские, а не UTC контейнера.
+      TZ: Europe/Moscow
+    healthcheck:
+      test: ['CMD', 'wget', '-qO-', 'http://127.0.0.1:8787/api/health']
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      - edge
+    logging: *logging
+
 secrets:
   env:
     file: ../.env
