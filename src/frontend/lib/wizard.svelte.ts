@@ -6,11 +6,10 @@
  * прямо в `wizard.input`: руны отслеживают его вглубь.
  */
 
-import type { MissingField } from '#/core/fields.ts'
-import type { ForwardingOrder } from '#/core/order/parse.ts'
-import type { OrderSummary } from '#/core/prefill.ts'
-import type { Carrier, RequestInput } from '#/core/request/build.ts'
-import { api, later } from '#/frontend/lib/api.ts'
+import { api, later } from '#frontend/lib/api.ts'
+import type { AnalyzeResponse, BuildResponse } from '#shared/api.ts'
+import type { ForwardingOrder } from '#shared/order.ts'
+import type { Carrier, OrderSummary, RequestInput } from '#shared/request.ts'
 
 export const STEPS = [
 	{ id: 'upload', title: 'Поручение' },
@@ -23,19 +22,6 @@ export type StepId = (typeof STEPS)[number]['id']
 
 /** Какое из полей адреса сейчас ищут: погрузка, выгрузка или чей-то реквизит. */
 export type AddressTarget = 'loadingAddress' | 'unloadingAddress' | 'carrier' | 'forwarder'
-
-type AnalyzeResponse = {
-	order: ForwardingOrder
-	summary: OrderSummary
-	input: RequestInput
-	missing: MissingField[]
-}
-
-type BuildResponse = {
-	/** Готовые байты заявки в base64: в браузере её не пересобирают и не показывают. */
-	file: string
-	missing: MissingField[]
-}
 
 const EMPTY: BuildResponse = { file: '', missing: [] }
 

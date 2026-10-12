@@ -5,7 +5,7 @@
  * погрузки, выгрузка — в поясе своего. Коды регионов те же, что в элементе Регион.
  */
 
-import type { FiasAddress } from '#/core/address/schema.ts'
+import type { FiasAddress } from '#shared/address.ts'
 
 const BY_OFFSET: Record<string, number[]> = {
 	'+02:00': [39],

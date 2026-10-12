@@ -1,11 +1,12 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 
-import { missingFields, withPlaceholders } from '#/core/fields.ts'
-import { CLIENT_TITLE, FORWARDER_TITLE } from '#/core/fixtures/order.ts'
-import { parseForwardingOrder } from '#/core/order/parse.ts'
-import { prefill } from '#/core/prefill.ts'
-import { buildCarriageRequest, type RequestInput } from '#/core/request/build.ts'
+import { missingFields, withPlaceholders } from '#backend/core/fields.ts'
+import { CLIENT_TITLE, FORWARDER_TITLE } from '#backend/core/fixtures/order.ts'
+import { parseForwardingOrder } from '#backend/core/order/parse.ts'
+import { prefill } from '#backend/core/prefill.ts'
+import { buildCarriageRequest } from '#backend/core/request/build.ts'
+import type { RequestInput } from '#shared/request.ts'
 
 const order = parseForwardingOrder({ client: CLIENT_TITLE, forwarder: FORWARDER_TITLE })
 

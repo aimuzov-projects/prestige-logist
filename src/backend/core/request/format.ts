@@ -1,6 +1,6 @@
 /** Приведение значений к тому виду, в котором их пишут Диадок и Контур Логистика. */
 
-import { REQUEST_PREFIX } from '#/core/request/constants.ts'
+import { REQUEST_PREFIX } from '#backend/core/request/constants.ts'
 
 /**
  * ПЭ описывает кузов словом, заявка — кодом типа погрузки.

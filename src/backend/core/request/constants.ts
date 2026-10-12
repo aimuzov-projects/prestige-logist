@@ -37,6 +37,3 @@ export const VEHICLE_DEFAULTS = { type: 'Грузовой', capacity: '0', volum
 
 /** Согласование времени: во всех наших заявках стоит «1». */
 export const TIME_AGREED = '1'
-
-/** В поручении времён нет, только даты. Девять утра — то, с чем работает диспетчер. */
-export const DEFAULT_TIME = '09:00:00'

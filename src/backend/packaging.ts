@@ -5,12 +5,9 @@
  * ЭЗЗ 5661. Список статичный, поэтому тянем его один раз на процесс.
  */
 
-const PICKLIST = 'https://api.kontur.ru/picklist/v2/10448/?filter=&take=400'
+import type { PackagingKind } from '#shared/api.ts'
 
-export type PackagingKind = {
-	code: string
-	name: string
-}
+const PICKLIST = 'https://api.kontur.ru/picklist/v2/10448/?filter=&take=400'
 
 let cache: Promise<PackagingKind[]> | undefined
 

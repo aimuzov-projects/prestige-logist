@@ -4,8 +4,8 @@
 	import Download from '@lucide/svelte/icons/download'
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle'
 
-	import Button from '#/frontend/components/ui/Button.svelte'
-	import { STEPS, wizard } from '#/frontend/lib/wizard.svelte.ts'
+	import Button from '#frontend/components/ui/Button.svelte'
+	import { STEPS, wizard } from '#frontend/lib/wizard.svelte.ts'
 
 	/**
 	 * Файл отдаём ровно теми байтами, что собрал сервер: windows-1251, иначе Логистика

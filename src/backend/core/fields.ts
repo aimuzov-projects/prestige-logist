@@ -3,8 +3,8 @@
  * либо подтягивается из ЕГРЮЛ, либо зашито константой в сборщике заявки.
  */
 
-import { isTextOnly } from '#/core/address/schema.ts'
-import type { RequestInput } from '#/core/request/build.ts'
+import { isTextOnly } from '#shared/address.ts'
+import type { MissingField, RequestInput } from '#shared/request.ts'
 
 export type RequiredField = {
 	path: string
@@ -84,12 +84,6 @@ export const REQUIRED_FIELDS: RequiredField[] = [
 		filled: (input) => Boolean(input.unloadingDate),
 	},
 ]
-
-export type MissingField = {
-	path: string
-	label: string
-	step: RequiredField['step']
-}
 
 export function missingFields(input: RequestInput): MissingField[] {
 	return REQUIRED_FIELDS.filter((field) => !field.filled(input)).map(({ path, label, step }) => ({

@@ -5,7 +5,7 @@ import { defineConfig } from 'astro/config'
 const proxy = { '/api': 'http://localhost:8787' }
 
 export default defineConfig({
-	// Сайт -- только часть src: рядом лежат API (backend) и общее с ним ядро (core).
+	// Рядом с сайтом в src/ лежат API и общий с ним код.
 	srcDir: './src/frontend',
 	// Абсолютные ссылки в canonical, og:url и sitemap.
 	site: 'https://logist.aimuzov.online',

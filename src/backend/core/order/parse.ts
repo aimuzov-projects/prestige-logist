@@ -1,9 +1,10 @@
 import { XMLParser } from 'fast-xml-parser'
 
-import { fromXml } from '#/core/address/fias.ts'
-import type { FiasAddress } from '#/core/address/schema.ts'
-import type { OrderTitles } from '#/core/order/read-input.ts'
-import { KND_FORWARDING_ORDER } from '#/core/request/constants.ts'
+import { fromXml } from '#backend/core/address/fias.ts'
+import type { OrderTitles } from '#backend/core/order/read-input.ts'
+import { KND_FORWARDING_ORDER } from '#backend/core/request/constants.ts'
+import type { FiasAddress } from '#shared/address.ts'
+import type { ForwardingOrder, Organization, PersonName, Signatory } from '#shared/order.ts'
 
 const parser = new XMLParser({
 	ignoreAttributes: false,
@@ -41,51 +42,6 @@ function attr(node: Node, name: string): string | undefined {
 
 /** Есть ли под этим ключом хоть что-то: отличает пустой узел от настоящего. */
 const present = (node: Node) => Object.keys(node).length > 0
-
-export type Organization = {
-	name?: string
-	inn?: string
-	kpp?: string
-	ogrn?: string
-}
-
-export type PersonName = {
-	lastName?: string
-	firstName?: string
-	middleName?: string
-}
-
-export type Signatory = {
-	authorityKind?: string
-	position?: string
-	name?: PersonName
-}
-
-export type ForwardingOrder = {
-	senderBox?: string
-	number?: string
-	date?: string
-	dates: {
-		shipmentFrom?: string
-		shipmentTo?: string
-		deliveryFrom?: string
-		deliveryTo?: string
-	}
-	client: Organization
-	forwarder: Organization
-	forwarderAddress: FiasAddress
-	consignor: Organization
-	cargo: {
-		name?: string
-		packageCount?: string
-		grossWeight?: string
-		volume?: string
-	}
-	vehicle: { bodyType?: string }
-	loadingAddress: FiasAddress
-	unloadingAddress: FiasAddress
-	signatory?: Signatory
-}
 
 /**
  * Заявке нужен ФИАС, но 1С шлёт адрес строкой в АдрИнф.

@@ -51,6 +51,8 @@
 		"typescript": "6.0.3"
 	},
 	"imports": {
-		"#/*": "./src/*"
+		"#frontend/*": "./src/frontend/*",
+		"#backend/*": "./src/backend/*",
+		"#shared/*": "./src/shared/*"
 	}
 }

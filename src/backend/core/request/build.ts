@@ -1,10 +1,7 @@
-import { addressNode } from '#/core/address/fias.ts'
-import type { FiasAddress } from '#/core/address/schema.ts'
-import type { ForwardingOrder, PersonName, Signatory } from '#/core/order/parse.ts'
+import { addressNode } from '#backend/core/address/fias.ts'
 import {
 	CARGO_DEFAULTS,
 	CARRIAGE_TERMS,
-	DEFAULT_TIME,
 	FOOD_CARRIAGE,
 	FORM_VERSION,
 	FUNCTION,
@@ -15,7 +12,7 @@ import {
 	RUSSIA_COUNTRY_CODE,
 	TIME_AGREED,
 	VEHICLE_DEFAULTS,
-} from '#/core/request/constants.ts'
+} from '#backend/core/request/constants.ts'
 import {
 	dateTime,
 	fnsDate,
@@ -24,47 +21,14 @@ import {
 	requestFileId,
 	toCompactDate,
 	toGuillemets,
-} from '#/core/request/format.ts'
-import { offsetByAddress } from '#/core/timezone.ts'
-import { el, serialize, textEl, type XmlNode } from '#/core/xml/serialize.ts'
+} from '#backend/core/request/format.ts'
+import { offsetByAddress } from '#backend/core/timezone.ts'
+import { el, serialize, textEl, type XmlNode } from '#backend/core/xml/serialize.ts'
+import type { ForwardingOrder, PersonName } from '#shared/order.ts'
+import { DEFAULT_TIME, type Carrier, type RequestInput } from '#shared/request.ts'
 
 const LOADING_POINT = '1'
 const UNLOADING_POINT = '2'
-
-export type Carrier = {
-	kind: 'ЮЛ' | 'ИП'
-	inn?: string
-	name?: string
-	kpp?: string
-	ogrn?: string
-	ogrnip?: string
-	lastName?: string
-	firstName?: string
-	middleName?: string
-	phone?: string
-	address?: FiasAddress
-	/** Ящика ЭДО у нас нет: сегмент ИдФайл остаётся пустым, получателя проставит Диадок. */
-	edmBox?: string
-}
-
-export type Forwarder = {
-	fullName?: string
-	address?: FiasAddress
-}
-
-/** Значения, которых нет в поручении: их вводит оператор в форме. */
-export type RequestInput = {
-	orderNumber?: string
-	issuedAt?: Date
-	forwarder: Forwarder
-	carrier: Carrier
-	loadingAddress?: FiasAddress
-	unloadingAddress?: FiasAddress
-	loadingDate?: string
-	unloadingDate?: string
-	packageKind?: string
-	signatory?: Signatory
-}
 
 /** Пустой <ФИО /> в заявке лишний: у подписи по сертификату имени нет вовсе. */
 function personName(name?: PersonName): XmlNode[] {
