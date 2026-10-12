@@ -1,7 +1,7 @@
 # Сайт на сервере projects. Порты 80/443 держит общий Caddy из aimuzov-projects/infra-server,
 # он проксирует домен сюда по сети edge.
 
-name: __PROJECT__
+name: prestige-logist
 
 x-logging: &logging
   driver: json-file
@@ -14,14 +14,14 @@ services:
     build:
       context: ..
       secrets: [env]
-    image: __PROJECT__
-    container_name: __PROJECT__
+    image: prestige-logist
+    container_name: prestige-logist
     restart: unless-stopped
     networks:
       - edge
     logging: *logging
 
-# Переменные сборки лежат в /srv/__PROJECT__/.env, образец в .env.example.
+# Переменные сборки лежат в /srv/prestige-logist/.env, образец в .env.example.
 secrets:
   env:
     file: ../.env

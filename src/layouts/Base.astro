@@ -1,6 +1,5 @@
 ---
 import '#/styles/global.css'
-import Metrika from '#/components/Metrika.astro'
 import { site } from '#/data/site.ts'
 import { pageTitle } from '#/lib/title.ts'
 
@@ -36,7 +35,6 @@ const canonical = new URL(Astro.url.pathname, Astro.site)
 		<slot name="head" />
 	</head>
 	<body>
-		<Metrika />
 		<slot />
 	</body>
 </html>

@@ -1,6 +1,6 @@
 export const site = {
 	/** Название сайта: `<title>` главной, `og:site_name`, хвост заголовков остальных страниц. */
-	name: '__NAME__',
+	name: 'Конвертер поручений',
 	/** `meta description` и `og:description` по умолчанию. */
-	description: '__DESCRIPTION__',
+	description: 'Конвертер поручения экспедитору в заявку на перевозку груза',
 }
