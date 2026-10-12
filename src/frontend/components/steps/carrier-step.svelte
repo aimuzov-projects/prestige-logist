@@ -4,12 +4,12 @@
 	import Pencil from '@lucide/svelte/icons/pencil'
 
 	import type { Carrier } from '#shared/request.ts'
-	import AddressPicker from '#frontend/components/AddressPicker.svelte'
-	import Badge from '#frontend/components/ui/Badge.svelte'
-	import Button from '#frontend/components/ui/Button.svelte'
-	import Card from '#frontend/components/ui/Card.svelte'
-	import Field from '#frontend/components/ui/Field.svelte'
-	import Grid from '#frontend/components/ui/Grid.svelte'
+	import AddressPicker from '#frontend/components/address-picker.svelte'
+	import Badge from '#frontend/components/ui/badge.svelte'
+	import Button from '#frontend/components/ui/button.svelte'
+	import Card from '#frontend/components/ui/card.svelte'
+	import Field from '#frontend/components/ui/field.svelte'
+	import Grid from '#frontend/components/ui/grid.svelte'
 	import { wizard } from '#frontend/lib/wizard.svelte.ts'
 
 	const KINDS: Array<[Carrier['kind'], string]> = [

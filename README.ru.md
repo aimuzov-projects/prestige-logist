@@ -21,6 +21,7 @@
 Всё живёт в `src/`:
 
 - [`src/frontend`](src/frontend) — сайт на [Astro](https://astro.build) (`srcDir`). Визард — остров на [Svelte 5](https://svelte.dev), состояние — класс на рунах в [`wizard.svelte.ts`](src/frontend/lib/wizard.svelte.ts).
+- Все файлы, компоненты тоже, называются в kebab-case: `base.astro`, `address-picker.svelte`. Имя в разметке задаёт импорт (`import AddressPicker from '#frontend/components/address-picker.svelte'`), а за файлами следит правило `unicorn/filename-case` в oxlint.
 - [`src/backend`](src/backend) — API на голом `node:http`, Node запускает TypeScript сам, без сборки. Пять ручек под `/api`: `analyze`, `build`, `carrier`, `address`, `packaging`.
   Внутри, в [`src/backend/core`](src/backend/core), — ядро конвертации: оно читает zip и пишет windows-1251, поэтому работает только в API.
 - [`src/shared`](src/shared) — то, что нужно обеим сторонам: типы контракта API и пара чистых функций. Сайт из `src/backend` ничего не импортирует.

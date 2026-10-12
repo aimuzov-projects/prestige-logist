@@ -4,7 +4,7 @@
 	import Download from '@lucide/svelte/icons/download'
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle'
 
-	import Button from '#frontend/components/ui/Button.svelte'
+	import Button from '#frontend/components/ui/button.svelte'
 	import { STEPS, wizard } from '#frontend/lib/wizard.svelte.ts'
 
 	/**

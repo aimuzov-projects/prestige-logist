@@ -21,6 +21,7 @@ An operator drops the order's zip, fills in what the order does not carry (order
 Everything lives in `src/`:
 
 - [`src/frontend`](src/frontend) — the [Astro](https://astro.build) site (`srcDir`). The wizard is a [Svelte 5](https://svelte.dev) island, its state is a class on runes in [`wizard.svelte.ts`](src/frontend/lib/wizard.svelte.ts).
+- Every file, components included, is named in kebab-case: `base.astro`, `address-picker.svelte`. The name used in markup comes from the import (`import AddressPicker from '#frontend/components/address-picker.svelte'`), and the `unicorn/filename-case` rule in oxlint keeps file names in line.
 - [`src/backend`](src/backend) — the API: plain `node:http`, Node runs the TypeScript itself, no build step. Five endpoints under `/api`: `analyze`, `build`, `carrier`, `address`, `packaging`.
   Inside, [`src/backend/core`](src/backend/core) is the conversion core: it reads zip and writes windows-1251, so it runs only in the API.
 - [`src/shared`](src/shared) — what both sides need: the API contract types and a couple of pure helpers. The site never imports from `src/backend`.
