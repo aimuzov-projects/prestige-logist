@@ -5,18 +5,17 @@
 	import Pencil from '@lucide/svelte/icons/pencil'
 	import TriangleAlert from '@lucide/svelte/icons/triangle-alert'
 
-	import type { PersonName } from '#/core/order/parse.ts'
-	import AddressPicker from '#/frontend/components/AddressPicker.svelte'
-	import Alert from '#/frontend/components/ui/Alert.svelte'
-	import Badge from '#/frontend/components/ui/Badge.svelte'
-	import Button from '#/frontend/components/ui/Button.svelte'
-	import Card from '#/frontend/components/ui/Card.svelte'
-	import Field from '#/frontend/components/ui/Field.svelte'
-	import Grid from '#/frontend/components/ui/Grid.svelte'
-	import { api, later } from '#/frontend/lib/api.ts'
-	import { wizard } from '#/frontend/lib/wizard.svelte.ts'
-
-	type PackagingKind = { code: string; name: string }
+	import type { PackagingKind } from '#shared/api.ts'
+	import type { PersonName } from '#shared/order.ts'
+	import AddressPicker from '#frontend/components/AddressPicker.svelte'
+	import Alert from '#frontend/components/ui/Alert.svelte'
+	import Badge from '#frontend/components/ui/Badge.svelte'
+	import Button from '#frontend/components/ui/Button.svelte'
+	import Card from '#frontend/components/ui/Card.svelte'
+	import Field from '#frontend/components/ui/Field.svelte'
+	import Grid from '#frontend/components/ui/Grid.svelte'
+	import { api, later } from '#frontend/lib/api.ts'
+	import { wizard } from '#frontend/lib/wizard.svelte.ts'
 
 	let editingForwarder = $state(false)
 	let pickingKind = $state(false)

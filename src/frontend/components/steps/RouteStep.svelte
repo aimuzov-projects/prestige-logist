@@ -2,10 +2,10 @@
 	import PackageMinus from '@lucide/svelte/icons/package-minus'
 	import PackagePlus from '@lucide/svelte/icons/package-plus'
 
-	import { DEFAULT_TIME } from '#/core/request/constants.ts'
-	import AddressPicker from '#/frontend/components/AddressPicker.svelte'
-	import Card from '#/frontend/components/ui/Card.svelte'
-	import { wizard } from '#/frontend/lib/wizard.svelte.ts'
+	import { DEFAULT_TIME } from '#shared/request.ts'
+	import AddressPicker from '#frontend/components/AddressPicker.svelte'
+	import Card from '#frontend/components/ui/Card.svelte'
+	import { wizard } from '#frontend/lib/wizard.svelte.ts'
 
 	/** В форме дата живёт как ДД.ММ.ГГГГ, а input[type=date] хочет ISO. */
 	const toIso = (date?: string) => {

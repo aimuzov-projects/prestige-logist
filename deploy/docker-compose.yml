@@ -13,6 +13,7 @@ services:
   site:
     build:
       context: ..
+      dockerfile: deploy/frontend.Dockerfile
       secrets: [env]
     image: prestige-logist
     container_name: prestige-logist
@@ -26,7 +27,7 @@ services:
   api:
     build:
       context: ..
-      dockerfile: src/backend/Dockerfile
+      dockerfile: deploy/backend.Dockerfile
     image: prestige-logist-api
     container_name: prestige-logist-api
     restart: unless-stopped

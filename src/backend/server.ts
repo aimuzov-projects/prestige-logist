@@ -7,16 +7,18 @@
 
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http'
 
-import { searchAddresses } from '#/backend/dadata.ts'
-import { carrierByInn, dadataToken, forwarderByInn } from '#/backend/lookup.ts'
-import { searchPackaging } from '#/backend/packaging.ts'
-import { missingFields, withPlaceholders } from '#/core/fields.ts'
-import type { ForwardingOrder } from '#/core/order/parse.ts'
-import { parseForwardingOrder } from '#/core/order/parse.ts'
-import { readInput } from '#/core/order/read-input.ts'
-import { prefill, summarize } from '#/core/prefill.ts'
-import { buildCarriageRequest, type RequestInput } from '#/core/request/build.ts'
-import { encodeXml } from '#/core/xml/encoding.ts'
+import { missingFields, withPlaceholders } from '#backend/core/fields.ts'
+import { parseForwardingOrder } from '#backend/core/order/parse.ts'
+import { readInput } from '#backend/core/order/read-input.ts'
+import { prefill, summarize } from '#backend/core/prefill.ts'
+import { buildCarriageRequest } from '#backend/core/request/build.ts'
+import { encodeXml } from '#backend/core/xml/encoding.ts'
+import { searchAddresses } from '#backend/dadata.ts'
+import { carrierByInn, dadataToken, forwarderByInn } from '#backend/lookup.ts'
+import { searchPackaging } from '#backend/packaging.ts'
+import type { AnalyzeResponse, BuildResponse } from '#shared/api.ts'
+import type { ForwardingOrder } from '#shared/order.ts'
+import type { RequestInput } from '#shared/request.ts'
 
 const PORT = Number(process.env.PORT ?? 8787)
 const LIMIT = 20 * 1024 * 1024
@@ -48,7 +50,7 @@ const analyze: Handler = async (_, request) => {
 	const order = parseForwardingOrder(readInput(await readBody(request)))
 	const forwarderDetails = await forwarderByInn(order.forwarder.inn)
 	const input = prefill(order, { forwarderDetails })
-	return [200, { order, summary: summarize(order), input, missing: missingFields(input) }]
+	return [200, { order, summary: summarize(order), input, missing: missingFields(input) } satisfies AnalyzeResponse]
 }
 
 /**
@@ -65,7 +67,7 @@ const build: Handler = async (_, request) => {
 	const draft = { ...withPlaceholders(input, missing), issuedAt: new Date() }
 	const xml = buildCarriageRequest(order, draft)
 	// Отдаём только байты в windows-1251: Логистика не смотрит на декларацию кодировки.
-	return [200, { file: encodeXml(xml).toString('base64'), missing }]
+	return [200, { file: encodeXml(xml).toString('base64'), missing } satisfies BuildResponse]
 }
 
 const routes: Record<string, Handler> = {

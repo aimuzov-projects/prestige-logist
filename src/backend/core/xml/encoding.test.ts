@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import iconv from 'iconv-lite'
 
-import { decodeXml, encodeXml } from '#/core/xml/encoding.ts'
+import { decodeXml, encodeXml } from '#backend/core/xml/encoding.ts'
 
 test('заявка уходит в windows-1251', () => {
 	const xml = '<?xml version="1.0" encoding="windows-1251"?><Файл Наим="Ёлка «№1»" />'

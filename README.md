@@ -22,7 +22,8 @@ Everything lives in `src/`:
 
 - [`src/frontend`](src/frontend) — the [Astro](https://astro.build) site (`srcDir`). The wizard is a [Svelte 5](https://svelte.dev) island, its state is a class on runes in [`wizard.svelte.ts`](src/frontend/lib/wizard.svelte.ts).
 - [`src/backend`](src/backend) — the API: plain `node:http`, Node runs the TypeScript itself, no build step. Five endpoints under `/api`: `analyze`, `build`, `carrier`, `address`, `packaging`.
-- [`src/core`](src/core) — the conversion core. It reads zip and writes windows-1251, so it runs only in the API; the browser imports nothing but its types.
+  Inside, [`src/backend/core`](src/backend/core) is the conversion core: it reads zip and writes windows-1251, so it runs only in the API.
+- [`src/shared`](src/shared) — what both sides need: the API contract types and a couple of pure helpers. The site never imports from `src/backend`.
 
 The parsed order goes to the browser whole and comes back with every rebuild, so the zip is uploaded exactly once and the server keeps no state. The request is rebuilt on every form change with a 300 ms debounce, each new request aborts the previous one. Missing fields go into the draft as `[[Field name]]` placeholders, and the download stays disabled until none are left.
 

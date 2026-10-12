@@ -6,7 +6,7 @@
  * и побайтовая сверка с эталоном — основной способ проверки. Поэтому пишем сами.
  */
 
-import { REQUEST_ENCODING } from '#/core/xml/encoding.ts'
+import { REQUEST_ENCODING } from '#backend/core/xml/encoding.ts'
 
 export type XmlNode = {
 	name: string

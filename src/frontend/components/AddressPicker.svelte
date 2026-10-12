@@ -4,12 +4,12 @@
 	import Search from '@lucide/svelte/icons/search'
 	import X from '@lucide/svelte/icons/x'
 
-	import type { FiasAddress } from '#/core/address/schema.ts'
-	import { addressToText } from '#/core/prefill.ts'
-	import Badge from '#/frontend/components/ui/Badge.svelte'
-	import Button from '#/frontend/components/ui/Button.svelte'
-	import { api, later } from '#/frontend/lib/api.ts'
-	import { wizard, type AddressTarget } from '#/frontend/lib/wizard.svelte.ts'
+	import { addressToText, type FiasAddress } from '#shared/address.ts'
+	import type { AddressSuggestion } from '#shared/api.ts'
+	import Badge from '#frontend/components/ui/Badge.svelte'
+	import Button from '#frontend/components/ui/Button.svelte'
+	import { api, later } from '#frontend/lib/api.ts'
+	import { wizard, type AddressTarget } from '#frontend/lib/wizard.svelte.ts'
 
 	type Props = {
 		target: AddressTarget
@@ -17,8 +17,6 @@
 		label?: string
 		address?: FiasAddress
 	}
-
-	type Suggestion = { label: string; address: FiasAddress }
 
 	let { target, label, address }: Props = $props()
 
@@ -30,7 +28,7 @@
 	const filled = $derived(Boolean(address && Object.keys(address).length))
 
 	let query = $state('')
-	let suggestions = $state<Suggestion[]>([])
+	let suggestions = $state<AddressSuggestion[]>([])
 	let searching = $state(false)
 	let error = $state('')
 
@@ -44,7 +42,7 @@
 		searching = true
 		later(300, controller.signal, async () => {
 			try {
-				;({ suggestions } = await api<{ suggestions: Suggestion[] }>(
+				;({ suggestions } = await api<{ suggestions: AddressSuggestion[] }>(
 					`/api/address?query=${encodeURIComponent(text)}`,
 					{ signal: controller.signal },
 				))

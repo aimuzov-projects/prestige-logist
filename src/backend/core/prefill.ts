@@ -1,6 +1,6 @@
-import { isTextOnly, type FiasAddress } from '#/core/address/schema.ts'
-import type { ForwardingOrder } from '#/core/order/parse.ts'
-import type { Carrier, RequestInput } from '#/core/request/build.ts'
+import { addressToText, isTextOnly, type FiasAddress } from '#shared/address.ts'
+import type { ForwardingOrder } from '#shared/order.ts'
+import type { Carrier, OrderSummary, RequestInput } from '#shared/request.ts'
 
 const byFias = (address?: FiasAddress) => (isTextOnly(address) ? undefined : address)
 
@@ -37,22 +37,6 @@ export function prefill(
 	}
 }
 
-export type OrderSummary = {
-	number?: string
-	date?: string
-	client: string
-	forwarder: string
-	consignor: string
-	cargo?: string
-	packageCount?: string
-	grossWeight?: string
-	bodyType?: string
-	shipment: string
-	delivery: string
-	from: string
-	to: string
-}
-
 /** Короткая сводка поручения — чтобы оператор убедился, что загрузил тот файл. */
 export function summarize(order: ForwardingOrder): OrderSummary {
 	return {
@@ -70,17 +54,4 @@ export function summarize(order: ForwardingOrder): OrderSummary {
 		from: addressToText(order.loadingAddress),
 		to: addressToText(order.unloadingAddress),
 	}
-}
-
-export function addressToText(address: FiasAddress = {}): string {
-	if (address.text) return address.text
-	const parts = [
-		address.postalCode,
-		address.municipalDistrict?.name,
-		address.locality && `${address.locality.kind} ${address.locality.name}`,
-		address.street && `${address.street.type} ${address.street.name}`,
-		...(address.buildings ?? []).map((b) => `${b.type}. ${b.number}`),
-		...(address.premises ?? []).map((p) => `${p.type}. ${p.number}`),
-	]
-	return parts.filter(Boolean).join(', ')
 }

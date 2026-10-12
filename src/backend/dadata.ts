@@ -6,9 +6,10 @@
  * dadata отдаёт по тексту адреса из поручения, совпадает с ИдНом в заявке ЭЗЗ 5667.
  */
 
-import type { FiasAddress } from '#/core/address/schema.ts'
-import type { ForwarderDetails } from '#/core/prefill.ts'
-import type { Carrier } from '#/core/request/build.ts'
+import type { ForwarderDetails } from '#backend/core/prefill.ts'
+import type { FiasAddress } from '#shared/address.ts'
+import type { AddressSuggestion } from '#shared/api.ts'
+import type { Carrier } from '#shared/request.ts'
 
 const SUGGEST_ADDRESS = 'https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address'
 const FIND_PARTY = 'https://suggestions.dadata.ru/suggestions/api/4_1/rs/findById/party'
@@ -51,11 +52,6 @@ export function toAddress(data: DadataAddress): FiasAddress {
 		].filter(Boolean) as FiasAddress['buildings'],
 		premises: data.flat ? [{ type: data.flat_type ?? undefined, number: data.flat }] : undefined,
 	})
-}
-
-export type AddressSuggestion = {
-	label: string
-	address: FiasAddress
 }
 
 /** Ответ dadata по организации — только те поля, которые нам действительно нужны. */

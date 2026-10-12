@@ -1,6 +1,6 @@
 import AdmZip from 'adm-zip'
 
-import { decodeXml } from '#/core/xml/encoding.ts'
+import { decodeXml } from '#backend/core/xml/encoding.ts'
 
 const ZIP_SIGNATURE = [0x50, 0x4b, 0x03, 0x04]
 

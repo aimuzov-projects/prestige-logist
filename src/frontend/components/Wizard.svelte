@@ -5,12 +5,12 @@
 	import RouteIcon from '@lucide/svelte/icons/route'
 	import Truck from '@lucide/svelte/icons/truck'
 
-	import StepNav from '#/frontend/components/StepNav.svelte'
-	import CarrierStep from '#/frontend/components/steps/CarrierStep.svelte'
-	import RequestStep from '#/frontend/components/steps/RequestStep.svelte'
-	import RouteStep from '#/frontend/components/steps/RouteStep.svelte'
-	import UploadStep from '#/frontend/components/steps/UploadStep.svelte'
-	import { STEPS, wizard, type StepId } from '#/frontend/lib/wizard.svelte.ts'
+	import StepNav from '#frontend/components/StepNav.svelte'
+	import CarrierStep from '#frontend/components/steps/CarrierStep.svelte'
+	import RequestStep from '#frontend/components/steps/RequestStep.svelte'
+	import RouteStep from '#frontend/components/steps/RouteStep.svelte'
+	import UploadStep from '#frontend/components/steps/UploadStep.svelte'
+	import { STEPS, wizard, type StepId } from '#frontend/lib/wizard.svelte.ts'
 
 	const VIEWS = { upload: UploadStep, carrier: CarrierStep, route: RouteStep, request: RequestStep }
 

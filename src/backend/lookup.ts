@@ -5,9 +5,9 @@
  * него один и тот же ИНН улетал бы в dadata десятки раз подряд.
  */
 
-import { findParty, looksLikeInn, toCarrier, toForwarderDetails } from '#/backend/dadata.ts'
-import type { ForwarderDetails } from '#/core/prefill.ts'
-import type { Carrier } from '#/core/request/build.ts'
+import type { ForwarderDetails } from '#backend/core/prefill.ts'
+import { findParty, looksLikeInn, toCarrier, toForwarderDetails } from '#backend/dadata.ts'
+import type { Carrier } from '#shared/request.ts'
 
 export const dadataToken = process.env.DADATA_TOKEN
 

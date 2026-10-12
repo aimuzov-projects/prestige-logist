@@ -1,5 +1,5 @@
-import { ADDRESS_LEVELS, type AddressPart, type FiasAddress } from '#/core/address/schema.ts'
-import { el, textEl, type XmlNode } from '#/core/xml/serialize.ts'
+import { el, textEl, type XmlNode } from '#backend/core/xml/serialize.ts'
+import { ADDRESS_LEVELS, type AddressPart, type FiasAddress } from '#shared/address.ts'
 
 type XmlElement = Record<string, unknown>
 
