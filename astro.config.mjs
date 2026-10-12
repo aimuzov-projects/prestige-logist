@@ -2,13 +2,19 @@ import sitemap from '@astrojs/sitemap'
 import svelte from '@astrojs/svelte'
 import { defineConfig } from 'astro/config'
 
+const proxy = { '/api': 'http://localhost:8787' }
+
 export default defineConfig({
+	// Сайт -- только часть src: рядом лежат API (backend) и общее с ним ядро (core).
+	srcDir: './src/frontend',
 	// Абсолютные ссылки в canonical, og:url и sitemap.
 	site: 'https://logist.aimuzov.online',
 	// CSS немного: внутри HTML он не блокирует первую отрисовку отдельным запросом.
 	build: { inlineStylesheets: 'always' },
 	// Svelte для интерактивных островков, остальное -- статичный HTML с ванильными скриптами.
 	integrations: [svelte(), sitemap()],
+	// На проде /api отдаёт Caddy сервису API, локально его роль играет прокси Vite: и в dev, и в preview.
+	vite: { server: { proxy }, preview: { proxy } },
 	// Подсветка Shiki несовместима с CSP.
 	markdown: { syntaxHighlight: false },
 	// Astro кладёт CSP с хешами своих скриптов и стилей в <meta> страницы. Внешних источников
