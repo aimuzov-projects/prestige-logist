@@ -1,11 +1,12 @@
 ---
 import '@fontsource-variable/inter'
 import '#frontend/styles/global.css'
+import SiteFooter from '#frontend/components/site-footer.astro'
 import { site } from '#frontend/data/site.ts'
 import { pageTitle } from '#frontend/lib/title.ts'
 
 type Props = {
-	/** Название страницы, к нему добавится название сайта. У главной не задаётся. */
+	/** Название страницы, к нему добавится название сайта. Без него — одно название сайта. */
 	title?: string
 	/** `meta description` и `og:description`, по умолчанию `site.description`. */
 	description?: string
@@ -39,5 +40,6 @@ const canonical = new URL(Astro.url.pathname, Astro.site)
 	</head>
 	<body>
 		<slot />
+		<SiteFooter />
 	</body>
 </html>

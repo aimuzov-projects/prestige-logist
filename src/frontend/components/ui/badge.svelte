@@ -16,8 +16,8 @@
 		font-size: 0.75rem;
 		font-weight: 500;
 		line-height: 1.25rem;
-		color: var(--brand-text);
-		background: var(--brand-soft);
+		color: var(--selected-text);
+		background: var(--selected-soft);
 
 		&--mono {
 			margin-left: 0;

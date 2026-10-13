@@ -38,8 +38,8 @@ import Base from '#frontend/layouts/base.astro'
 <style>
 	.missing {
 		display: flex;
+		flex: 1;
 		flex-direction: column;
-		min-height: 100svh;
 
 		/* Штрих как у lucide-иконок в остальном интерфейсе. */
 		&__glyph {
@@ -111,7 +111,6 @@ import Base from '#frontend/layouts/base.astro'
 			color: var(--primary-fg);
 			text-decoration: none;
 			background: var(--primary);
-			box-shadow: inset 0 1px 0 oklch(100% 0 0 / 18%);
 			transition: background-color 0.15s;
 
 			@media (--reduced-motion) {
@@ -119,7 +118,7 @@ import Base from '#frontend/layouts/base.astro'
 			}
 
 			&:hover {
-				background: color-mix(in oklch, var(--primary) 88%, black);
+				background: color-mix(in srgb, var(--primary) 88%, black);
 			}
 
 			&:focus-visible {

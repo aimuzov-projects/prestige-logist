@@ -64,6 +64,7 @@
 						Дата{#if dateMissing}<span class="missing-mark" title="Не заполнено"></span>{/if}
 					</label>
 					<input
+						autocomplete="off"
 						id={`${point.key}-date`}
 						class={['input', 'route__date', dateMissing && 'input--missing']}
 						type="date"

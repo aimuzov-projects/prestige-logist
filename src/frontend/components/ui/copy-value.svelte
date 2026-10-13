@@ -70,9 +70,9 @@
 			}
 
 			&:hover {
-				border-color: color-mix(in oklch, var(--brand-text) 35%, transparent);
-				color: var(--brand-text);
-				background: color-mix(in oklch, var(--brand-text) 12%, transparent);
+				border-color: var(--hover-border);
+				color: var(--selected-text);
+				background: var(--hover-bg);
 			}
 
 			&--done,

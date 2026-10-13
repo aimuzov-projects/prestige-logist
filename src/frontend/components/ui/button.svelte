@@ -58,12 +58,9 @@
 		&--primary {
 			color: var(--primary-fg);
 			background: var(--primary);
-			box-shadow:
-				inset 0 1px 0 oklch(100% 0 0 / 18%),
-				0 1px 2px color-mix(in oklch, var(--primary) 40%, transparent);
 
 			&:hover:not(:disabled) {
-				background: color-mix(in oklch, var(--primary) 88%, black);
+				background: color-mix(in srgb, var(--primary) 88%, black);
 			}
 		}
 

@@ -40,14 +40,23 @@
 	<div class="summary__head" onclick={onHeadClick}>
 		<span class="summary__icon">{@render icon()}</span>
 		<div class="summary__content">{@render summary()}</div>
-		<ChipButton aria-expanded={open} aria-controls={id} onclick={() => (open = !open)}>
-			{#if open}
-				<ChevronUp size={14} />
-				Свернуть
-			{:else}
-				<Pencil size={14} />
-				Изменить
-			{/if}
+		<ChipButton
+			aria-expanded={open}
+			aria-controls={id}
+			aria-label={open ? 'Свернуть' : 'Изменить'}
+			onclick={() => (open = !open)}
+		>
+			<!-- Обе подписи в одной ячейке, видна одна: ширина кнопки — по длинной, и она не прыгает. -->
+			<span class="summary__toggle">
+				<span class={['summary__state', open && 'summary__state--hidden']}>
+					<Pencil size={14} />
+					Изменить
+				</span>
+				<span class={['summary__state', !open && 'summary__state--hidden']}>
+					<ChevronUp size={14} />
+					Свернуть
+				</span>
+			</span>
 		</ChipButton>
 	</div>
 	{#if open}
@@ -61,7 +70,7 @@
 	.summary {
 		border: 1px solid transparent;
 		border-radius: var(--radius-sm);
-		background: var(--brand-soft);
+		background: var(--selected-soft);
 		transition:
 			background-color 0.15s,
 			border-color 0.15s;
@@ -94,7 +103,7 @@
 			}
 
 			&:hover {
-				background: color-mix(in oklch, var(--brand-text) 8%, transparent);
+				background: var(--hover-bg);
 			}
 		}
 
@@ -108,7 +117,7 @@
 			background: var(--surface);
 
 			&:hover {
-				background: color-mix(in oklch, var(--fg) 6%, var(--surface));
+				background: color-mix(in srgb, var(--fg) 6%, var(--surface));
 			}
 		}
 
@@ -117,11 +126,16 @@
 			flex-shrink: 0;
 			align-items: center;
 			height: 1.5rem;
-			color: var(--brand-text);
+			color: var(--selected-text);
 		}
 
 		&--warning &__icon {
 			color: var(--warning);
+		}
+
+		/* Раскрытая шапка нейтральная — и значок в ней серый, а не цвета «выбрано». */
+		&--open > &__head &__icon {
+			color: var(--muted);
 		}
 
 		&__content {
@@ -147,6 +161,22 @@
 			overflow: hidden;
 			text-overflow: ellipsis;
 			white-space: nowrap;
+		}
+
+		&__toggle {
+			display: inline-grid;
+		}
+
+		&__state {
+			display: inline-flex;
+			grid-area: 1 / 1;
+			gap: 0.3125rem;
+			align-items: center;
+			justify-content: center;
+
+			&--hidden {
+				visibility: hidden;
+			}
 		}
 
 		&__body {

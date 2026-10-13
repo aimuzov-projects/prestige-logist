@@ -5,6 +5,7 @@
 	import { addressToText, type FiasAddress } from '#shared/address.ts'
 	import type { AddressSuggestion } from '#shared/api.ts'
 	import InfoTip from '#frontend/components/ui/info-tip.svelte'
+	import Skeleton from '#frontend/components/ui/skeleton.svelte'
 	import SummaryBox from '#frontend/components/ui/summary-box.svelte'
 	import { api, later } from '#frontend/lib/api.ts'
 	import { wizard, type AddressTarget } from '#frontend/lib/wizard.svelte.ts'
@@ -83,6 +84,7 @@
 		<Search class="address__search-icon" size={16} />
 		<!-- svelte-ignore a11y_autofocus -->
 		<input
+			autocomplete="off"
 			class={['input', 'address__query', missing && !filled && 'input--missing']}
 			placeholder="Индекс, город, улица, дом"
 			aria-label={label ? `Поиск: ${label.toLowerCase()}` : 'Поиск адреса'}
@@ -92,9 +94,17 @@
 	</div>
 
 	{#if error}<p class="address__error">{error}</p>{/if}
-	{#if searching}<p class="hint">Ищем…</p>{/if}
-
-	{#if suggestions.length || (!searching && query.trim().length >= 3)}
+	{#if searching}
+		<!-- Заготовка списка, пока DaData подбирает варианты: он появится ровно на этом месте. -->
+		<ul class="address__list" role="status" aria-label="Ищем адрес">
+			{#each [70, 55, 80] as width (width)}
+				<li class="address__item address__option address__option--skeleton">
+					<Skeleton width="0.875rem" height="0.875rem" round />
+					<Skeleton width={`${width}%`} />
+				</li>
+			{/each}
+		</ul>
+	{:else if suggestions.length || query.trim().length >= 3}
 		<ul class="address__list">
 			{#each suggestions as item (item.label)}
 				<li class="address__item">
@@ -201,12 +211,23 @@
 			background: none;
 
 			&:hover {
-				background: var(--brand-soft);
+				background: var(--hover-bg);
 			}
 
 			&--empty {
 				cursor: default;
 				color: var(--muted);
+			}
+
+			/* Строка-заготовка ростом с настоящий вариант: список не прыгает, когда данные придут. */
+			&--skeleton {
+				cursor: default;
+				align-items: center;
+				min-height: 2.3rem;
+
+				&:hover {
+					background: none;
+				}
 			}
 
 			:global(.address__option-pin) {

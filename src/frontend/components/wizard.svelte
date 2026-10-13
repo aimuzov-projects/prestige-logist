@@ -1,11 +1,13 @@
 <script lang="ts">
 	import Check from '@lucide/svelte/icons/check'
+	import CircleHelp from '@lucide/svelte/icons/circle-help'
 	import ClipboardList from '@lucide/svelte/icons/clipboard-list'
 	import FileInput from '@lucide/svelte/icons/file-input'
 	import RouteIcon from '@lucide/svelte/icons/route'
 	import Truck from '@lucide/svelte/icons/truck'
 
 	import MissingList from '#frontend/components/missing-list.svelte'
+	import Logo from '#frontend/components/logo.svelte'
 	import StepNav from '#frontend/components/step-nav.svelte'
 	import ThemeToggle from '#frontend/components/theme-toggle.svelte'
 	import CarrierStep from '#frontend/components/steps/carrier-step.svelte'
@@ -75,6 +77,11 @@
 		<div class="container wizard__header-inner">
 			<!-- Угол над шагами: заголовок шага стоит над формой, а здесь — переключатель темы. -->
 			<div class="wizard__corner">
+				<Logo href="/about" label="Логист — о проекте" wordmark="wide" />
+				<a href="/about" class="wizard__help" aria-label="Как это работает" title="Как это работает">
+					<CircleHelp size={14} />
+				</a>
+				<span class="wizard__spacer"></span>
 				<ThemeToggle />
 			</div>
 			<div class="wizard__heading">
@@ -145,12 +152,13 @@
 <style>
 	.wizard {
 		--header: 4.25rem;
-		/* Шапка и тело делят одни колонки: знак стоит над шагами, заголовок — над формой. */
+		/* Один шаг на вертикальные отступы: от шапки до островов и между островами. */
+		--space: 1rem;
+		/* Шапка и тело делят одни колонки: логотип стоит над шагами, заголовок — над формой. */
 		--aside: 14rem;
 		--columns: var(--aside) minmax(0, 1fr);
-		--column-gap: 2.5rem;
-		/* Один шаг на все вертикальные отступы: от шапки, между шагами и островами, между островами. */
-		--space: 1rem;
+		/* Как видимый зазор от заголовка шага до острова: граница шапки прозрачна, глаз меряет от текста. */
+		--column-gap: 1.875rem;
 
 		display: flex;
 		flex: 1;
@@ -190,12 +198,48 @@
 		}
 
 		/* На широком экране угол над шагами, на узком — просто первая кнопка в строке. */
+		/* Угол над шагами: логотип слева, тема и справка справа. На узком — подряд, впритык. */
 		&__corner {
 			display: flex;
-			margin-left: -0.75rem;
+			gap: 0.25rem;
+			align-items: center;
+		}
 
-			@media (--md) {
-				margin-left: 0;
+		&__spacer {
+			flex: 1;
+			min-width: 0.25rem;
+		}
+
+		/* Маленький «?» вплотную к названию: справка о самом сервисе. На телефоне место в шапке
+		   нужнее шагу — туда ведёт ссылка на первом шаге. */
+		&__help {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			width: 1.5rem;
+			height: 1.5rem;
+			border-radius: 50%;
+			color: var(--muted);
+			transition:
+				background-color 0.15s,
+				color 0.15s;
+
+			@media (--below-sm) {
+				display: none;
+			}
+
+			@media (--reduced-motion) {
+				transition: none;
+			}
+
+			&:hover {
+				color: var(--fg);
+				background: var(--surface);
+			}
+
+			&:focus-visible {
+				outline: none;
+				box-shadow: 0 0 0 3px var(--ring);
 			}
 		}
 
@@ -307,7 +351,6 @@
 				border-color: var(--brand);
 				color: var(--brand-fg);
 				background: var(--brand);
-				box-shadow: 0 0 0 4px var(--brand-soft);
 			}
 
 			&--done {

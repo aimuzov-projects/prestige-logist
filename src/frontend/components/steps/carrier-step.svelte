@@ -12,6 +12,7 @@
 	import Disclosure from '#frontend/components/ui/disclosure.svelte'
 	import Field from '#frontend/components/ui/field.svelte'
 	import Grid from '#frontend/components/ui/grid.svelte'
+	import Skeleton from '#frontend/components/ui/skeleton.svelte'
 	import SummaryBox from '#frontend/components/ui/summary-box.svelte'
 	import { wizard } from '#frontend/lib/wizard.svelte.ts'
 
@@ -52,19 +53,21 @@
 		<Grid>
 			<Field label="Наименование" for="carrier-name" span={2} missing={wizard.missingPaths.has('carrier.name')}>
 				<input
+					autocomplete="off"
 					id="carrier-name"
 					class={['input', wizard.missingPaths.has('carrier.name') && 'input--missing']}
 					bind:value={carrier.name}
 				/>
 			</Field>
 			<Field label="КПП" for="carrier-kpp">
-				<input id="carrier-kpp" class="input" bind:value={carrier.kpp} />
+				<input autocomplete="off" id="carrier-kpp" class="input" bind:value={carrier.kpp} />
 			</Field>
 			<Field label="ОГРН" for="carrier-ogrn">
-				<input id="carrier-ogrn" class="input" bind:value={carrier.ogrn} />
+				<input autocomplete="off" id="carrier-ogrn" class="input" bind:value={carrier.ogrn} />
 			</Field>
 			<Field label="Телефон" for="carrier-phone" span={2}>
 				<input
+					autocomplete="off"
 					id="carrier-phone"
 					class="input"
 					placeholder="Необязательно, в ЕГРЮЛ его нет"
@@ -80,6 +83,7 @@
 				missing={wizard.missingPaths.has('carrier.name') && !carrier.lastName?.trim()}
 			>
 				<input
+					autocomplete="off"
 					id="carrier-last-name"
 					class={[
 						'input',
@@ -94,6 +98,7 @@
 				missing={wizard.missingPaths.has('carrier.name') && !carrier.firstName?.trim()}
 			>
 				<input
+					autocomplete="off"
 					id="carrier-first-name"
 					class={[
 						'input',
@@ -103,15 +108,16 @@
 				/>
 			</Field>
 			<Field label="Отчество" for="carrier-middle-name">
-				<input id="carrier-middle-name" class="input" bind:value={carrier.middleName} />
+				<input autocomplete="off" id="carrier-middle-name" class="input" bind:value={carrier.middleName} />
 			</Field>
 		</Grid>
 		<Grid>
 			<Field label="ОГРНИП" for="carrier-ogrnip">
-				<input id="carrier-ogrnip" class="input" bind:value={carrier.ogrnip} />
+				<input autocomplete="off" id="carrier-ogrnip" class="input" bind:value={carrier.ogrnip} />
 			</Field>
 			<Field label="Телефон" for="carrier-phone">
 				<input
+					autocomplete="off"
 					id="carrier-phone"
 					class="input"
 					placeholder="Необязательно, в ЕГРИП его нет"
@@ -129,6 +135,7 @@
 			<Field label="ИНН перевозчика" for="carrier-inn" missing={wizard.missingPaths.has('carrier.inn')}>
 				<div class="carrier__inn">
 					<input
+						autocomplete="off"
 						id="carrier-inn"
 						class={['input', wizard.missingPaths.has('carrier.inn') && 'input--missing']}
 						inputmode="numeric"
@@ -142,7 +149,16 @@
 
 			<!-- Найденное — плашкой с «Изменить», как выбранный адрес. Ручной ввод — запасной путь
 			     для ИНН, которых нет в реестре: пока ничего не нашлось, он в раскрывашке. -->
-			{#if boxed}
+			{#if wizard.carrierSearching}
+				<!-- Заготовка плашки, пока реестр ищет ИНН: она встанет ровно сюда. -->
+				<div class="carrier__skeleton" role="status" aria-label="Ищем перевозчика">
+					<Skeleton width="1rem" height="1rem" />
+					<div class="carrier__skeleton-lines">
+						<Skeleton width="60%" height="1rem" />
+						<Skeleton width="40%" />
+					</div>
+				</div>
+			{:else if boxed}
 				<SummaryBox id="carrier-manual" bind:open={editing}>
 					{#snippet icon()}<Building size={16} />{/snippet}
 					{#snippet summary()}
@@ -209,6 +225,23 @@
 			flex-wrap: wrap;
 			gap: 0.375rem 1rem;
 			font-size: 0.8125rem;
+		}
+
+		/* Ростом и отступами как плашка SummaryBox, которую заменяет. */
+		&__skeleton {
+			display: flex;
+			gap: 0.75rem;
+			align-items: flex-start;
+			padding: 0.75rem 1rem;
+			border-radius: var(--radius-sm);
+			background: var(--surface);
+		}
+
+		&__skeleton-lines {
+			display: flex;
+			flex: 1;
+			flex-direction: column;
+			gap: 0.5rem;
 		}
 
 		&__name {

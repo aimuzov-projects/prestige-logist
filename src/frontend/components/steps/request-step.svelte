@@ -62,6 +62,7 @@
 
 {#snippet kindSearch(input: RequestInput)}
 	<input
+		autocomplete="off"
 		id="packaging-query"
 		class="input"
 		placeholder="Найдите по названию или коду: поддон, ящик, 8A"
@@ -95,6 +96,7 @@
 				hint="Дата и время формирования проставятся сами в момент сборки."
 			>
 				<input
+					autocomplete="off"
 					id="order-number"
 					class={['input', 'request__number', wizard.missingPaths.has('orderNumber') && 'input--missing']}
 					bind:value={input.orderNumber}
@@ -144,6 +146,7 @@
 				{/snippet}
 				<Field label="Полное наименование" for="forwarder-name" missing={forwarderNameMissing}>
 					<input
+						autocomplete="off"
 						id="forwarder-name"
 						class={['input', forwarderNameMissing && 'input--missing']}
 						bind:value={input.forwarder.fullName}
@@ -179,6 +182,7 @@
 				<Grid>
 					<Field label="Должность" for="signatory-position" span={2}>
 						<input
+							autocomplete="off"
 							id="signatory-position"
 							class="input"
 							value={input.signatory?.position ?? ''}
@@ -188,6 +192,7 @@
 					</Field>
 					<Field label="Фамилия" for="signatory-last-name">
 						<input
+							autocomplete="off"
 							id="signatory-last-name"
 							class="input"
 							value={input.signatory?.name?.lastName ?? ''}
@@ -196,6 +201,7 @@
 					</Field>
 					<Field label="Имя" for="signatory-first-name">
 						<input
+							autocomplete="off"
 							id="signatory-first-name"
 							class="input"
 							value={input.signatory?.name?.firstName ?? ''}
@@ -261,7 +267,7 @@
 			background: none;
 
 			&:hover {
-				background: var(--brand-soft);
+				background: var(--hover-bg);
 			}
 		}
 

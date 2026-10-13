@@ -9,6 +9,7 @@
 	import Button from '#frontend/components/ui/button.svelte'
 	import Card from '#frontend/components/ui/card.svelte'
 	import ChipButton from '#frontend/components/ui/chip-button.svelte'
+	import Skeleton from '#frontend/components/ui/skeleton.svelte'
 	import { wizard } from '#frontend/lib/wizard.svelte.ts'
 
 	const SUMMARY_LABELS: Array<[keyof OrderSummary, string]> = [
@@ -61,8 +62,24 @@
 
 <div class="upload">
 	<!-- Разобранное поручение занимает место дропзоны: загружать второй раз незачем,
-	     а понадобится — рядом со сводкой есть «Заменить». -->
-	{#if !wizard.summary}
+	     а понадобится — рядом со сводкой есть «Заменить». Пока сервер разбирает файл,
+	     на этом месте заготовка той же сводки. -->
+	{#if wizard.analyzing}
+		<div role="status" aria-label="Разбираем комплект">
+			<Card>
+				<div class="upload__skeleton-head">
+					<Skeleton width="1rem" height="1rem" />
+					<Skeleton width="12rem" height="1rem" />
+				</div>
+				<div class="upload__summary">
+					{#each SUMMARY_LABELS as [key], index (key)}
+						<Skeleton width="7rem" />
+						<Skeleton width={`${[60, 35, 70, 75, 65, 30, 15, 20, 40, 50, 50, 80, 55][index] ?? 50}%`} />
+					{/each}
+				</div>
+			</Card>
+		</div>
+	{:else if !wizard.summary}
 		<div
 			class={['upload__drop', dragging && 'upload__drop--over']}
 			role="button"
@@ -97,6 +114,7 @@
 				<span class="upload__demo-title">Нет комплекта под рукой?</span>
 				Откройте пример — синтетическое поручение, на нём видно все шаги. Или
 				<a class="upload__demo-link" href={DEMO} download>скачайте архив</a>, чтобы загрузить его сами.
+				<a class="upload__demo-link" href="/about">Как это работает</a>
 			</p>
 			<Button variant="outline" size="lg" disabled={wizard.analyzing} onclick={tryDemo}>
 				<Sparkles size={16} />
@@ -109,7 +127,7 @@
 		<Alert variant="danger">{wizard.analyzeError}</Alert>
 	{/if}
 
-	{#if wizard.summary}
+	{#if wizard.summary && !wizard.analyzing}
 		{@const summary = wizard.summary}
 		<Card title={wizard.fileName} icon={FileCheck}>
 			{#snippet action()}
@@ -157,8 +175,8 @@
 
 			&:hover,
 			&--over {
-				border-color: var(--brand);
-				background: color-mix(in oklch, var(--brand-soft) 50%, var(--bg));
+				border-color: color-mix(in srgb, var(--selected-text) 45%, transparent);
+				background: var(--hover-bg);
 			}
 
 			&:focus-visible {
@@ -201,11 +219,10 @@
 			font-weight: 500;
 			color: var(--primary-fg);
 			background: var(--primary);
-			box-shadow: inset 0 1px 0 oklch(100% 0 0 / 18%);
 		}
 
 		&__drop:hover &__button {
-			background: color-mix(in oklch, var(--primary) 88%, black);
+			background: color-mix(in srgb, var(--primary) 88%, black);
 		}
 
 		&__demo {
@@ -251,6 +268,14 @@
 
 		&__term {
 			color: var(--muted);
+		}
+
+		/* Заготовка шапки сводки: иконка и имя файла, ростом как заголовок карточки. */
+		&__skeleton-head {
+			display: flex;
+			gap: 0.5rem;
+			align-items: center;
+			height: 1.5rem;
 		}
 	}
 </style>
