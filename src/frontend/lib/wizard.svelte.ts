@@ -8,6 +8,7 @@
 
 import { api, later } from '#frontend/lib/api.ts'
 import type { AnalyzeResponse, BuildResponse } from '#shared/api.ts'
+import { missingFields } from '#shared/fields.ts'
 import type { ForwardingOrder } from '#shared/order.ts'
 import type { Carrier, OrderSummary, RequestInput } from '#shared/request.ts'
 
@@ -42,8 +43,14 @@ class Wizard {
 	request = $state<BuildResponse>(EMPTY)
 	building = $state(false)
 	buildError = $state('')
-	missing = $derived(this.request.missing)
+	/**
+	 * Пропуски считаем здесь же, по тем же правилам, что и сервер: ответа сборки ждать
+	 * незачем, а с ним подсветка отставала от правки на паузу и запрос.
+	 */
+	missing = $derived(this.input ? missingFields(this.input) : [])
 	isComplete = $derived(Boolean(this.order) && this.missing.length === 0)
+	/** Пути незаполненного, вроде `carrier.inn`: по ним форма подсвечивает свои поля. */
+	missingPaths = $derived(new Set(this.missing.map((field) => field.path)))
 
 	/** Сколько незаполненного осталось на каждом шаге — показываем прямо на вкладках. */
 	missingByStep = $derived.by(() => {
@@ -54,8 +61,29 @@ class Wizard {
 
 	/** Имя файла заявки: по номеру заказа, а без него — просто черновик. */
 	downloadName = $derived(`zayavka-${this.input?.orderNumber?.trim() || 'draft'}.xml`)
+	canDownload = $derived(this.isComplete && !this.building && Boolean(this.request.file))
+
+	/**
+	 * Файл отдаём ровно теми байтами, что собрал сервер: windows-1251, иначе Логистика
+	 * его не прочтёт. Пересобирать в браузере нечего — base64 уже пришёл готовым.
+	 */
+	download = () => {
+		if (!this.canDownload) return
+		const bytes = Uint8Array.from(atob(this.request.file), (char) => char.charCodeAt(0))
+		const url = URL.createObjectURL(new Blob([bytes], { type: 'application/xml' }))
+		Object.assign(document.createElement('a'), { href: url, download: this.downloadName }).click()
+		URL.revokeObjectURL(url)
+	}
 
 	carrierInn = $derived(this.input?.carrier.inn?.trim())
+	/** Как перевозчика называть людям: наименование юрлица или ФИО предпринимателя. */
+	carrierName = $derived.by(() => {
+		const carrier = this.input?.carrier
+		if (carrier?.kind === 'ИП') {
+			return [carrier.lastName, carrier.firstName, carrier.middleName].filter(Boolean).join(' ')
+		}
+		return carrier?.name?.trim() ?? ''
+	})
 	/** Реквизиты, найденные по ИНН; null — не искали или в реестре нет. */
 	carrierFound = $state<Carrier | null>(null)
 	carrierSearching = $state(false)

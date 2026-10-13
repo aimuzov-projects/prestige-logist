@@ -15,12 +15,17 @@
 		border-radius: 999px;
 		font-size: 0.75rem;
 		font-weight: 500;
-		background: var(--surface);
+		line-height: 1.25rem;
+		color: var(--brand-text);
+		background: var(--brand-soft);
 
 		&--mono {
 			margin-left: 0;
+			border-radius: 0.375rem;
 			font-family: var(--font-mono);
 			font-size: 0.7rem;
+			color: var(--muted);
+			background: var(--surface);
 		}
 	}
 </style>

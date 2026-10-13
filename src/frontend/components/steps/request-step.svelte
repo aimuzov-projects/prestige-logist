@@ -1,28 +1,37 @@
 <script lang="ts">
-	import Building from '@lucide/svelte/icons/building-2'
-	import ChevronDown from '@lucide/svelte/icons/chevron-down'
+	import ClipboardList from '@lucide/svelte/icons/clipboard-list'
+	import Building from '@lucide/svelte/icons/building'
 	import Package from '@lucide/svelte/icons/package'
-	import Pencil from '@lucide/svelte/icons/pencil'
-	import TriangleAlert from '@lucide/svelte/icons/triangle-alert'
+	import UserPen from '@lucide/svelte/icons/user-pen'
 
 	import type { PackagingKind } from '#shared/api.ts'
 	import type { PersonName } from '#shared/order.ts'
+	import type { RequestInput } from '#shared/request.ts'
 	import AddressPicker from '#frontend/components/address-picker.svelte'
 	import Alert from '#frontend/components/ui/alert.svelte'
-	import Badge from '#frontend/components/ui/badge.svelte'
-	import Button from '#frontend/components/ui/button.svelte'
 	import Card from '#frontend/components/ui/card.svelte'
+	import CopyValue from '#frontend/components/ui/copy-value.svelte'
 	import Field from '#frontend/components/ui/field.svelte'
 	import Grid from '#frontend/components/ui/grid.svelte'
+	import SummaryBox from '#frontend/components/ui/summary-box.svelte'
 	import { api, later } from '#frontend/lib/api.ts'
 	import { wizard } from '#frontend/lib/wizard.svelte.ts'
 
 	let editingForwarder = $state(false)
 	let pickingKind = $state(false)
-	let showDetails = $state(false)
 
 	let packagingQuery = $state('')
 	let kinds = $state<PackagingKind[]>([])
+	/** Название выбранной тары: список справочника меняется с каждым запросом, а код остаётся. */
+	let pickedName = $state('')
+	const kindName = $derived(pickedName || kinds.find((kind) => kind.code === wizard.input?.packageKind)?.name || '')
+
+	function pick(input: RequestInput, kind: PackagingKind) {
+		input.packageKind = kind.code
+		pickedName = kind.name
+		pickingKind = false
+		packagingQuery = ''
+	}
 
 	// Пустой запрос тоже ищем: справочник отдаёт первые позиции, и выбрать можно сразу.
 	$effect(() => {
@@ -51,39 +60,49 @@
 	}
 </script>
 
+{#snippet kindSearch(input: RequestInput)}
+	<input
+		id="packaging-query"
+		class="input"
+		placeholder="Найдите по названию или коду: поддон, ящик, 8A"
+		bind:value={packagingQuery}
+	/>
+	{#if kinds.length}
+		<ul class="request__kinds">
+			{#each kinds as kind (kind.code)}
+				<li class="request__kind-item">
+					<button type="button" class="request__kind-option" onclick={() => pick(input, kind)}>
+						<span class="mono">{kind.code}</span>
+						{kind.name}
+					</button>
+				</li>
+			{/each}
+		</ul>
+	{/if}
+{/snippet}
+
 {#if wizard.input && wizard.order}
 	{@const input = wizard.input}
 	{@const order = wizard.order}
 	{@const signatoryFromTitle = Boolean(order.signatory?.position || order.signatory?.name)}
+	{@const forwarderNameMissing = wizard.missingPaths.has('forwarder.fullName')}
 	<div class="request">
-		<!-- Первым делом — чего не хватает для выгрузки и куда за этим идти. Когда всё
-		     заполнено, говорить нечего: кнопка выгрузки просто становится доступной. -->
-		{#if wizard.missing.length}
-			<Alert title="Осталось заполнить">
-				{#snippet icon()}<TriangleAlert size={16} />{/snippet}
-				<ul class="request__gaps">
-					{#each wizard.missing as field (field.path)}
-						<li>
-							<button type="button" class="request__gap" onclick={() => wizard.goTo(field.step)}>
-								{field.label}
-							</button>
-						</li>
-					{/each}
-				</ul>
-			</Alert>
-		{/if}
-
-		<Card title="Заявка">
+		<Card title="Заявка" icon={ClipboardList}>
 			<Field
 				label="Номер заказа"
 				for="order-number"
+				missing={wizard.missingPaths.has('orderNumber')}
 				hint="Дата и время формирования проставятся сами в момент сборки."
 			>
-				<input id="order-number" class="input request__number" bind:value={input.orderNumber} />
+				<input
+					id="order-number"
+					class={['input', 'request__number', wizard.missingPaths.has('orderNumber') && 'input--missing']}
+					bind:value={input.orderNumber}
+				/>
 			</Field>
 		</Card>
 
-		<Card title="Груз">
+		<Card title="Груз" icon={Package} info="Наименование, места и вес берутся из поручения.">
 			<dl class="request__cargo">
 				<dt class="request__term">Наименование</dt>
 				<dd>{order.cargo.name || '—'}</dd>
@@ -92,124 +111,100 @@
 				<dt class="request__term">Вес брутто, кг</dt>
 				<dd>{order.cargo.grossWeight || '—'}</dd>
 			</dl>
-			<p class="hint">Эти три поля берутся из поручения.</p>
 
-			<Field label="Вид тары" for="packaging-query">
-				{#if input.packageKind && !pickingKind}
-					<div class="request__kind">
-						<Package size={16} />
-						<Badge mono>{input.packageKind}</Badge>
-						{kinds.find((kind) => kind.code === input.packageKind)?.name}
-						<Button variant="ghost" size="lg" onclick={() => (pickingKind = true)}>
-							<Pencil size={16} />
-							Изменить
-						</Button>
-					</div>
+			<!-- Как адрес: выбранное — плашкой с «Изменить», пустое — сразу поиском. -->
+			<Field label="Вид тары" for={input.packageKind && !pickingKind ? undefined : 'packaging-query'}>
+				{#if input.packageKind}
+					<SummaryBox id="packaging" bind:open={pickingKind}>
+						{#snippet icon()}<Package size={16} />{/snippet}
+						{#snippet summary()}
+							<p>
+								<span class="mono">{input.packageKind}</span>
+								{kindName}
+							</p>
+						{/snippet}
+						{@render kindSearch(input)}
+					</SummaryBox>
 				{:else}
-					<input
-						id="packaging-query"
-						class="input"
-						placeholder="Найдите по названию или коду: поддон, ящик, 8A"
-						bind:value={packagingQuery}
-					/>
-					<ul class="request__kinds">
-						{#each kinds as kind (kind.code)}
-							<li class="request__kind-item">
-								<button
-									type="button"
-									class="request__kind-option"
-									onclick={() => {
-										input.packageKind = kind.code
-										pickingKind = false
-									}}
-								>
-									<span class="mono">{kind.code}</span>
-									{kind.name}
-								</button>
-							</li>
-						{/each}
-					</ul>
+					{@render kindSearch(input)}
 				{/if}
 			</Field>
 		</Card>
 
-		<!-- Свои реквизиты и подписант приходят готовыми — прячем их, чтобы не мешали. -->
-		<Button variant="outline" size="lg" wide onclick={() => (showDetails = !showDetails)}>
-			<span class="request__toggle">
-				<Building size={16} />
-				Грузоотправитель и подписант
-			</span>
-			<ChevronDown class={['request__chevron', showDetails && 'request__chevron--open']} size={16} />
-		</Button>
-
-		{#if showDetails}
-			<Card title="Грузоотправитель (мы)">
-				<div class="request__forwarder">
-					<div class="request__forwarder-text">
-						<p class="request__forwarder-name">{input.forwarder.fullName || '—'}</p>
-						<p class="hint">
-							ИНН {order.forwarder.inn}, КПП {order.forwarder.kpp} · наименование из ЕГРЮЛ
-						</p>
-					</div>
-					<Button variant="ghost" size="lg" onclick={() => (editingForwarder = !editingForwarder)}>
-						<Pencil size={16} />
-						{editingForwarder ? 'Свернуть' : 'Поправить'}
-					</Button>
-				</div>
-				{#if editingForwarder}
-					<Field label="Полное наименование" for="forwarder-name">
-						<input id="forwarder-name" class="input" bind:value={input.forwarder.fullName} />
-					</Field>
-				{/if}
-				<AddressPicker target="forwarder" label="Адрес грузоотправителя" address={input.forwarder.address} />
-			</Card>
-
-			<Card title="Подписант">
-				{#if signatoryFromTitle}
-					<div>
-						<p>
-							{order.signatory?.position}
-							{#if order.signatory?.name}
-								<span class="request__muted"> · {fullName(order.signatory.name)}</span>
-							{/if}
-						</p>
-						<p class="hint">Из титула экспедитора — править не нужно.</p>
-					</div>
-				{:else}
-					<!-- Подписанта спрашиваем, только когда титула экспедитора в комплекте не было. -->
-					<p class="request__muted">
-						Титула экспедитора в комплекте не было, поэтому подписанта заполните сами.
+		<!-- Как перевозчик: свои реквизиты — плашкой с «Изменить», адрес — тем же пикером. -->
+		<Card title="Грузоотправитель" icon={Building} info="Это мы: реквизиты и адрес берутся из поручения.">
+			<SummaryBox id="forwarder-manual" warning={forwarderNameMissing} bind:open={editingForwarder}>
+				{#snippet icon()}<Building size={16} />{/snippet}
+				{#snippet summary()}
+					<p class="request__forwarder-name">{input.forwarder.fullName || 'Без наименования'}</p>
+					<p class="request__codes">
+						{#if order.forwarder.inn}<CopyValue label="ИНН" value={order.forwarder.inn} />{/if}
+						{#if order.forwarder.kpp}<CopyValue label="КПП" value={order.forwarder.kpp} />{/if}
 					</p>
-					<Grid>
-						<Field label="Должность" for="signatory-position" span={2}>
-							<input
-								id="signatory-position"
-								class="input"
-								value={input.signatory?.position ?? ''}
-								oninput={(event) =>
-									(input.signatory = { ...input.signatory, position: event.currentTarget.value })}
-							/>
-						</Field>
-						<Field label="Фамилия" for="signatory-last-name">
-							<input
-								id="signatory-last-name"
-								class="input"
-								value={input.signatory?.name?.lastName ?? ''}
-								oninput={(event) => patchName({ lastName: event.currentTarget.value })}
-							/>
-						</Field>
-						<Field label="Имя" for="signatory-first-name">
-							<input
-								id="signatory-first-name"
-								class="input"
-								value={input.signatory?.name?.firstName ?? ''}
-								oninput={(event) => patchName({ firstName: event.currentTarget.value })}
-							/>
-						</Field>
-					</Grid>
-				{/if}
-			</Card>
-		{/if}
+				{/snippet}
+				<Field label="Полное наименование" for="forwarder-name" missing={forwarderNameMissing}>
+					<input
+						id="forwarder-name"
+						class={['input', forwarderNameMissing && 'input--missing']}
+						bind:value={input.forwarder.fullName}
+					/>
+				</Field>
+			</SummaryBox>
+			<AddressPicker
+				target="forwarder"
+				label="Адрес"
+				address={input.forwarder.address}
+				missing={wizard.missingPaths.has('forwarder.address')}
+			/>
+		</Card>
+
+		<Card
+			title="Подписант"
+			icon={UserPen}
+			info={signatoryFromTitle
+				? 'Взят из титула экспедитора, править не нужно.'
+				: 'Титула экспедитора в комплекте не было, поэтому подписанта заполните сами.'}
+		>
+			{#if signatoryFromTitle}
+				<p class="request__signer">
+					<UserPen class="request__signer-icon" size={16} />
+					<span>
+						{order.signatory?.position}
+						{#if order.signatory?.name}<span class="request__muted">
+								· {fullName(order.signatory.name)}</span
+							>{/if}
+					</span>
+				</p>
+			{:else}
+				<Grid>
+					<Field label="Должность" for="signatory-position" span={2}>
+						<input
+							id="signatory-position"
+							class="input"
+							value={input.signatory?.position ?? ''}
+							oninput={(event) =>
+								(input.signatory = { ...input.signatory, position: event.currentTarget.value })}
+						/>
+					</Field>
+					<Field label="Фамилия" for="signatory-last-name">
+						<input
+							id="signatory-last-name"
+							class="input"
+							value={input.signatory?.name?.lastName ?? ''}
+							oninput={(event) => patchName({ lastName: event.currentTarget.value })}
+						/>
+					</Field>
+					<Field label="Имя" for="signatory-first-name">
+						<input
+							id="signatory-first-name"
+							class="input"
+							value={input.signatory?.name?.firstName ?? ''}
+							oninput={(event) => patchName({ firstName: event.currentTarget.value })}
+						/>
+					</Field>
+				</Grid>
+			{/if}
+		</Card>
 
 		{#if wizard.buildError}
 			<Alert variant="danger" title="Заявка не собралась">{wizard.buildError}</Alert>
@@ -222,21 +217,6 @@
 		display: flex;
 		flex-direction: column;
 		gap: 1rem;
-
-		&__gaps {
-			display: flex;
-			flex-direction: column;
-			gap: 0.25rem;
-		}
-
-		&__gap {
-			cursor: pointer;
-			padding: 0;
-			border: 0;
-			text-decoration: underline;
-			text-underline-offset: 2px;
-			background: none;
-		}
 
 		&__number {
 			max-width: 20rem;
@@ -256,17 +236,13 @@
 			color: var(--muted);
 		}
 
-		&__kind {
-			display: flex;
-			gap: 0.5rem;
-			align-items: center;
-		}
-
 		&__kinds {
 			overflow-y: auto;
 			max-height: 14rem;
 			border: 1px solid var(--border);
-			border-radius: calc(var(--radius) * 0.8);
+			border-radius: var(--radius-sm);
+			background: var(--bg);
+			box-shadow: var(--shadow-sm);
 		}
 
 		&__kind-item + &__kind-item {
@@ -285,33 +261,31 @@
 			background: none;
 
 			&:hover {
-				background: var(--surface);
+				background: var(--brand-soft);
 			}
 		}
 
-		&__toggle {
-			display: flex;
-			gap: 0.5rem;
-			align-items: center;
-		}
-
-		:global(.request__chevron) {
-			transition: transform 0.15s;
-		}
-
-		:global(.request__chevron--open) {
-			transform: rotate(180deg);
-		}
-
-		&__forwarder {
+		/* Подписант из титула не правится: нейтральная серая плашка, голубая значила бы «можно изменить». */
+		&__signer {
 			display: flex;
 			gap: 0.75rem;
 			align-items: center;
-			justify-content: space-between;
+			min-height: 2.5rem;
+			padding: 0.4375rem 1rem;
+			border-radius: var(--radius-sm);
+			background: var(--surface);
+
+			:global(.request__signer-icon) {
+				flex-shrink: 0;
+				color: var(--muted);
+			}
 		}
 
-		&__forwarder-text {
-			min-width: 0;
+		&__codes {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.375rem 1rem;
+			font-size: 0.8125rem;
 		}
 
 		&__forwarder-name {

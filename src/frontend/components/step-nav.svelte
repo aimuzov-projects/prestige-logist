@@ -7,17 +7,6 @@
 	import Button from '#frontend/components/ui/button.svelte'
 	import { STEPS, wizard } from '#frontend/lib/wizard.svelte.ts'
 
-	/**
-	 * Файл отдаём ровно теми байтами, что собрал сервер: windows-1251, иначе Логистика
-	 * его не прочтёт. Пересобирать в браузере нечего — base64 уже пришёл готовым.
-	 */
-	function download() {
-		const bytes = Uint8Array.from(atob(wizard.request.file), (char) => char.charCodeAt(0))
-		const url = URL.createObjectURL(new Blob([bytes], { type: 'application/xml' }))
-		Object.assign(document.createElement('a'), { href: url, download: wizard.downloadName }).click()
-		URL.revokeObjectURL(url)
-	}
-
 	const loaded = $derived(Boolean(wizard.order))
 	const canGoBack = $derived(wizard.stepIndex > 0)
 	const last = $derived(wizard.stepIndex === STEPS.length - 1)
@@ -31,33 +20,27 @@
 {#if canGoBack || loaded}
 	<nav class="step-nav">
 		{#if canGoBack}
-			<Button variant="ghost" size="xl" onclick={wizard.back}>
+			<Button variant="ghost" size="lg" aria-label="Назад" onclick={wizard.back}>
 				<ArrowLeft size={16} />
-				Назад
+				<span class="step-nav__label">Назад</span>
 			</Button>
 		{/if}
 		{#if loaded}
-			<span class="step-nav__forward">
-				{#if last}
-					<Button
-						size="xl"
-						disabled={!wizard.isComplete || wizard.building || !wizard.request.file}
-						onclick={download}
-					>
-						{#if wizard.building}
-							<LoaderCircle class="spin" size={16} />
-						{:else}
-							<Download size={16} />
-						{/if}
-						Скачать XML
-					</Button>
-				{:else}
-					<Button size="xl" onclick={wizard.next}>
-						Дальше
-						<ArrowRight size={16} />
-					</Button>
-				{/if}
-			</span>
+			{#if last}
+				<Button size="lg" disabled={!wizard.canDownload} onclick={wizard.download}>
+					{#if wizard.building}
+						<LoaderCircle class="spin" size={16} />
+					{:else}
+						<Download size={16} />
+					{/if}
+					Скачать
+				</Button>
+			{:else}
+				<Button size="lg" onclick={wizard.next}>
+					Дальше
+					<ArrowRight size={16} />
+				</Button>
+			{/if}
 		{/if}
 	</nav>
 {/if}
@@ -65,12 +48,14 @@
 <style>
 	.step-nav {
 		display: flex;
+		gap: 0.5rem;
 		align-items: center;
-		justify-content: space-between;
-		margin-bottom: 1.5rem;
 
-		&__forward {
-			margin-left: auto;
+		/* На телефоне в шапке тесно: у «Назад» остаётся одна стрелка. */
+		&__label {
+			@media (--below-sm) {
+				display: none;
+			}
 		}
 	}
 </style>

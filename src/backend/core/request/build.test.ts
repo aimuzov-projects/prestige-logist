@@ -25,7 +25,7 @@ test('текстовый адрес в форму не попадает, а зн
 	assert.equal(input.unloadingAddress, undefined)
 	assert.deepEqual(
 		missingFields(input).map(({ path }) => path),
-		['orderNumber', 'carrier.inn', 'carrier.name', 'carrier.address', 'unloadingAddress'],
+		['carrier.inn', 'carrier.name', 'carrier.address', 'unloadingAddress', 'orderNumber'],
 	)
 })
 
