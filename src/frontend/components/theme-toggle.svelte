@@ -12,10 +12,13 @@
 	const KEY = 'theme'
 	const NEXT: Record<Theme, Theme> = { system: 'light', light: 'dark', dark: 'system' }
 	const VIEW = {
-		system: { icon: Monitor, label: 'как в системе' },
+		system: { icon: Monitor, label: 'как в системе' },
 		light: { icon: Sun, label: 'светлая' },
 		dark: { icon: Moon, label: 'тёмная' },
 	}
+
+	/** Убрать из Tab: в мастере клавиатурой ходят только по полям формы. */
+	let { skipTab = false }: { skipTab?: boolean } = $props()
 
 	let theme = $state<Theme>('system')
 	const view = $derived(VIEW[theme])
@@ -45,6 +48,7 @@
 	size="lg"
 	aria-label={`Тема: ${view.label}. Переключить`}
 	title={`Тема: ${view.label}`}
+	tabindex={skipTab ? -1 : undefined}
 	onclick={cycle}
 >
 	<view.icon size={16} />

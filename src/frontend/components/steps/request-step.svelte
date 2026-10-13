@@ -15,12 +15,15 @@
 	import Grid from '#frontend/components/ui/grid.svelte'
 	import SummaryBox from '#frontend/components/ui/summary-box.svelte'
 	import { api, later } from '#frontend/lib/api.ts'
+	import { enterList, moveInList } from '#frontend/lib/list-keys.ts'
 	import { wizard } from '#frontend/lib/wizard.svelte.ts'
 
 	let editingForwarder = $state(false)
 	let pickingKind = $state(false)
 
 	let packagingQuery = $state('')
+	let kindInput = $state<HTMLInputElement>()
+	let kindList = $state<HTMLUListElement>()
 	let kinds = $state<PackagingKind[]>([])
 	/** Название выбранной тары: список справочника меняется с каждым запросом, а код остаётся. */
 	let pickedName = $state('')
@@ -65,14 +68,22 @@
 		autocomplete="off"
 		id="packaging-query"
 		class="input"
-		placeholder="Найдите по названию или коду: поддон, ящик, 8A"
+		placeholder="Найдите по названию или коду: поддон, ящик, 8A"
+		bind:this={kindInput}
 		bind:value={packagingQuery}
+		onkeydown={(event) => enterList(event, kindList)}
 	/>
 	{#if kinds.length}
-		<ul class="request__kinds">
+		<!-- Сам список из Tab убран: прокручиваемый блок Chrome иначе выделяет целиком. -->
+		<ul class="request__kinds" tabindex="-1" bind:this={kindList}>
 			{#each kinds as kind (kind.code)}
 				<li class="request__kind-item">
-					<button type="button" class="request__kind-option" onclick={() => pick(input, kind)}>
+					<button
+						type="button"
+						class="request__kind-option"
+						onclick={() => pick(input, kind)}
+						onkeydown={(event) => moveInList(event, kindInput)}
+					>
 						<span class="mono">{kind.code}</span>
 						{kind.name}
 					</button>
@@ -93,7 +104,7 @@
 				label="Номер заказа"
 				for="order-number"
 				missing={wizard.missingPaths.has('orderNumber')}
-				hint="Дата и время формирования проставятся сами в момент сборки."
+				hint="Дата и время формирования проставятся сами в момент сборки."
 			>
 				<input
 					autocomplete="off"
@@ -104,7 +115,7 @@
 			</Field>
 		</Card>
 
-		<Card title="Груз" icon={Package} info="Наименование, места и вес берутся из поручения.">
+		<Card title="Груз" icon={Package} info="Наименование, места и вес берутся из поручения.">
 			<dl class="request__cargo">
 				<dt class="request__term">Наименование</dt>
 				<dd>{order.cargo.name || '—'}</dd>
@@ -134,11 +145,11 @@
 		</Card>
 
 		<!-- Как перевозчик: свои реквизиты — плашкой с «Изменить», адрес — тем же пикером. -->
-		<Card title="Грузоотправитель" icon={Building} info="Это мы: реквизиты и адрес берутся из поручения.">
+		<Card title="Грузоотправитель" icon={Building} info="Это мы: реквизиты и адрес берутся из поручения.">
 			<SummaryBox id="forwarder-manual" warning={forwarderNameMissing} bind:open={editingForwarder}>
 				{#snippet icon()}<Building size={16} />{/snippet}
 				{#snippet summary()}
-					<p class="request__forwarder-name">{input.forwarder.fullName || 'Без наименования'}</p>
+					<p class="request__forwarder-name">{input.forwarder.fullName || 'Без наименования'}</p>
 					<p class="request__codes">
 						{#if order.forwarder.inn}<CopyValue label="ИНН" value={order.forwarder.inn} />{/if}
 						{#if order.forwarder.kpp}<CopyValue label="КПП" value={order.forwarder.kpp} />{/if}
@@ -165,16 +176,15 @@
 			title="Подписант"
 			icon={UserPen}
 			info={signatoryFromTitle
-				? 'Взят из титула экспедитора, править не нужно.'
-				: 'Титула экспедитора в комплекте не было, поэтому подписанта заполните сами.'}
+				? 'Взят из титула экспедитора, править не нужно.'
+				: 'Титула экспедитора в комплекте не было, поэтому подписанта заполните сами.'}
 		>
 			{#if signatoryFromTitle}
 				<p class="request__signer">
 					<UserPen class="request__signer-icon" size={16} />
 					<span>
-						{order.signatory?.position}
-						{#if order.signatory?.name}<span class="request__muted">
-								· {fullName(order.signatory.name)}</span
+						{order.signatory?.position}{#if order.signatory?.name}<span class="request__muted"
+								> · {fullName(order.signatory.name)}</span
 							>{/if}
 					</span>
 				</p>
@@ -213,7 +223,7 @@
 		</Card>
 
 		{#if wizard.buildError}
-			<Alert variant="danger" title="Заявка не собралась">{wizard.buildError}</Alert>
+			<Alert variant="danger" title="Заявка не собралась">{wizard.buildError}</Alert>
 		{/if}
 	</div>
 {/if}
@@ -268,6 +278,13 @@
 
 			&:hover {
 				background: var(--hover-bg);
+			}
+
+			/* Список прокручивается и обрезает внешнюю рамку — фокус рисуем внутри строки. */
+			&:focus-visible {
+				background: var(--hover-bg);
+				outline: none;
+				box-shadow: inset 0 0 0 2px var(--ring);
 			}
 		}
 

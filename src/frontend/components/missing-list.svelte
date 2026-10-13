@@ -1,7 +1,8 @@
 <script lang="ts">
 	import CircleCheck from '@lucide/svelte/icons/circle-check'
+	import Download from '@lucide/svelte/icons/download'
 	import TriangleAlert from '@lucide/svelte/icons/triangle-alert'
-
+	import ChipButton from '#frontend/components/ui/chip-button.svelte'
 	import { STEPS, wizard } from '#frontend/lib/wizard.svelte.ts'
 
 	/** Пропуски по шагам и в их порядке — список читается так же, как идёт форма. */
@@ -29,7 +30,12 @@
 					<ul class="missing__list">
 						{#each group.fields as field (field.path)}
 							<li>
-								<button type="button" class="missing__item" onclick={() => wizard.goTo(field.step)}>
+								<button
+									type="button"
+									tabindex="-1"
+									class="missing__item"
+									onclick={() => wizard.goTo(field.step)}
+								>
 									{field.label}
 								</button>
 							</li>
@@ -39,20 +45,16 @@
 			{/each}
 		</section>
 	{:else}
-		<p class="missing missing--done">
-			<CircleCheck class="missing__done-icon" size={14} />
-			<span>
-				Всё заполнено,
-				<button
-					type="button"
-					class="missing__download"
-					disabled={!wizard.canDownload}
-					onclick={wizard.download}
-				>
-					скачать
-				</button>
-			</span>
-		</p>
+		<div class="missing missing--done">
+			<p class="missing__done-text">
+				<CircleCheck class="missing__done-icon" size={14} />
+				Заявка готова
+			</p>
+			<ChipButton tabindex={-1} onclick={wizard.tryDownload}>
+				<Download size={14} />
+				Скачать
+			</ChipButton>
+		</div>
 	{/if}
 {/if}
 
@@ -71,40 +73,28 @@
 			display: none;
 		}
 
+		/* Итог одной строкой: слева «готово», справа кнопка — как плашки с «Изменить» в форме. */
 		&--done {
 			flex-direction: row;
-			align-items: flex-start;
+			gap: 0.25rem;
+			align-items: center;
+			justify-content: space-between;
+			padding: 0.625rem 0.625rem 0.625rem 0.75rem;
 			border-color: color-mix(in oklch, var(--success) 25%, transparent);
+			background: var(--success-bg);
+		}
+
+		&__done-text {
+			display: flex;
+			gap: 0.375rem;
+			align-items: center;
 			font-size: 0.8125rem;
 			font-weight: 500;
 			color: var(--success);
-			background: var(--success-bg);
+			white-space: nowrap;
 
-			/* По первой строке: фраза может переноситься, значок остаётся у её начала. */
 			:global(.missing__done-icon) {
 				flex-shrink: 0;
-				margin-top: 0.1875rem;
-			}
-		}
-
-		/* Ссылкой, а не кнопкой: это продолжение фразы. Пока заявка пересобирается — бледная. */
-		&__download {
-			cursor: pointer;
-			padding: 0;
-			border: 0;
-			font-weight: 600;
-			color: inherit;
-			text-decoration: underline;
-			text-underline-offset: 2px;
-			background: none;
-
-			&:hover:not(:disabled) {
-				text-decoration-thickness: 2px;
-			}
-
-			&:disabled {
-				cursor: default;
-				opacity: 0.6;
 			}
 		}
 

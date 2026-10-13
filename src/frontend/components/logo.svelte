@@ -5,16 +5,18 @@
 		label: string
 		/** Подпись рядом со знаком: всегда или только на широком экране, где хватает места. */
 		wordmark?: 'always' | 'wide'
+		/** Убрать из Tab: в мастере клавиатурой ходят только по полям формы. */
+		skipTab?: boolean
 	}
 
-	let { href, label, wordmark = 'always' }: Props = $props()
+	let { href, label, wordmark = 'always', skipTab = false }: Props = $props()
 </script>
 
 <!--
 	Знак — «Л» из маршрута: две остановки внизу, путь через вершину. Тот же рисунок
 	в public/favicon.svg, только с цветом гвоздями: там нет переменных темы.
 -->
-<a {href} class="logo" aria-label={label}>
+<a {href} class="logo" aria-label={label} tabindex={skipTab ? -1 : undefined}>
 	<svg class="logo__mark" viewBox="0 0 32 32" aria-hidden="true">
 		<rect width="32" height="32" rx="9" fill="currentColor" />
 		<path

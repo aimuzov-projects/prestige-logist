@@ -25,9 +25,9 @@
 	--border: light-dark(oklch(92.5% 0.005 230), oklch(29% 0.007 230));
 	--border-strong: light-dark(oklch(85.5% 0.008 230), oklch(37% 0.01 230));
 
-	--brand: light-dark(oklch(53% 0.115 180), oklch(72% 0.13 180));
-	/* На светлой бирюзе тёмной темы белый текст не читается — там надпись тёмная. */
-	--brand-fg: light-dark(oklch(99% 0 0), oklch(18% 0.03 180));
+	/* В тёмной теме бирюза той же глубины, что и в светлой: на ней читается белый текст (4,7:1). */
+	--brand: light-dark(oklch(53% 0.115 180), oklch(53% 0.11 180));
+	--brand-fg: oklch(99% 0 0);
 	--brand-soft: light-dark(oklch(96% 0.035 180), oklch(29% 0.05 180));
 	--brand-text: light-dark(oklch(48% 0.1 180), oklch(82% 0.1 180));
 	/* Выбранное значение — голубым, отдельно от бирюзы кнопок: «выбрано, можно изменить». */
@@ -94,6 +94,11 @@ body {
 	line-height: 1.55;
 	color: var(--fg);
 	background: var(--canvas);
+}
+
+/* Подчёркивание отличает ссылку от текста, а под курсором уходит: отклик на наведение. */
+a:hover {
+	text-decoration: none;
 }
 
 h1,

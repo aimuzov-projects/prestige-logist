@@ -70,7 +70,7 @@
 					autocomplete="off"
 					id="carrier-phone"
 					class="input"
-					placeholder="Необязательно, в ЕГРЮЛ его нет"
+					placeholder="Необязательно, в ЕГРЮЛ его нет"
 					bind:value={carrier.phone}
 				/>
 			</Field>
@@ -120,7 +120,7 @@
 					autocomplete="off"
 					id="carrier-phone"
 					class="input"
-					placeholder="Необязательно, в ЕГРИП его нет"
+					placeholder="Необязательно, в ЕГРИП его нет"
 					bind:value={carrier.phone}
 				/>
 			</Field>
@@ -131,7 +131,7 @@
 {#if wizard.input}
 	{@const carrier = wizard.input.carrier}
 	<div class="carrier">
-		<Card title="Реквизиты" icon={FileText} info="Найдём по ИНН в ЕГРЮЛ или ЕГРИП. Если там нет — введите вручную.">
+		<Card title="Реквизиты" icon={FileText} info="Найдём по ИНН в ЕГРЮЛ или ЕГРИП. Если там нет — введите вручную.">
 			<Field label="ИНН перевозчика" for="carrier-inn" missing={wizard.missingPaths.has('carrier.inn')}>
 				<div class="carrier__inn">
 					<input
@@ -139,7 +139,7 @@
 						id="carrier-inn"
 						class={['input', wizard.missingPaths.has('carrier.inn') && 'input--missing']}
 						inputmode="numeric"
-						placeholder="10 цифр у юрлица, 12 у ИП"
+						placeholder="10 цифр у юрлица, 12 у ИП"
 						value={carrier.inn ?? ''}
 						oninput={(event) => (carrier.inn = event.currentTarget.value.trim())}
 					/>
@@ -163,7 +163,7 @@
 					{#snippet icon()}<Building size={16} />{/snippet}
 					{#snippet summary()}
 						<p class="carrier__name">
-							{wizard.carrierName || 'Без наименования'}<Badge>{carrier.kind}</Badge>
+							{wizard.carrierName || 'Без наименования'}<Badge>{carrier.kind}</Badge>
 						</p>
 						<p class="carrier__codes">
 							{#if carrier.inn}<CopyValue label="ИНН" value={carrier.inn} />{/if}
@@ -192,7 +192,7 @@
 		<Card
 			title="Адрес"
 			icon={MapPin}
-			info="Из ЕГРЮЛ приходит юридический адрес, а он у перевозчиков часто не тот — проверьте."
+			info="Из ЕГРЮЛ приходит юридический адрес, а он у перевозчиков часто не тот — проверьте."
 		>
 			<AddressPicker
 				target="carrier"

@@ -63,6 +63,36 @@ class Wizard {
 	downloadName = $derived(`zayavka-${this.input?.orderNumber?.trim() || 'draft'}.xml`)
 	canDownload = $derived(this.isComplete && !this.building && Boolean(this.request.file))
 
+	/** Короткое сообщение внизу экрана; гаснет само. */
+	notice = $state('')
+	#noticeTimer: ReturnType<typeof setTimeout> | undefined
+
+	notify(text: string) {
+		this.notice = text
+		clearTimeout(this.#noticeTimer)
+		this.#noticeTimer = setTimeout(() => (this.notice = ''), 4000)
+	}
+
+	/**
+	 * Кнопка «Скачать заявку» не гаснет: нажали раньше времени — объясняем, чего не хватает,
+	 * и ведём к разделу с первым пропуском.
+	 */
+	tryDownload = () => {
+		const missing = this.missing
+		if (missing.length) {
+			const names = missing.slice(0, 3).map((field) => field.label)
+			const rest = missing.length - names.length
+			this.notify(`Заполните: ${names.join(', ')}${rest > 0 ? ` и ещё ${rest}` : ''}`)
+			this.goTo(missing[0].step)
+			return
+		}
+		if (!this.canDownload) {
+			this.notify('Собираем заявку, нажмите через секунду')
+			return
+		}
+		this.download()
+	}
+
 	/**
 	 * Файл отдаём ровно теми байтами, что собрал сервер: windows-1251, иначе Логистика
 	 * его не прочтёт. Пересобирать в браузере нечего — base64 уже пришёл готовым.
@@ -112,9 +142,33 @@ class Wizard {
 		}
 	}
 
+	/**
+	 * Раздел, к которому сейчас едет прокрутка. Пока едет, слежение за экраном молчит:
+	 * иначе подсветка в сайдбаре перебрала бы все разделы по пути.
+	 */
+	#scrollingTo: StepId | null = null
+	#settle: ReturnType<typeof setTimeout> | undefined
+
+	/** Форма одна длинная: шаг — это раздел, к которому прокручиваем. */
 	goTo(id: StepId) {
 		if (id !== 'upload' && !this.order) return
 		this.step = id
+		this.#scrollingTo = id
+		const still = matchMedia('(prefers-reduced-motion: reduce)').matches
+		document.getElementById(`step-${id}`)?.scrollIntoView({ behavior: still ? 'auto' : 'smooth', block: 'start' })
+		// scrollend есть не везде, поэтому слежение возвращаем и по таймеру.
+		clearTimeout(this.#settle)
+		this.#settle = setTimeout(() => this.settle(), 900)
+	}
+
+	/** Раздел, который сейчас на экране, — от прокрутки самого пользователя. */
+	spy(id: StepId) {
+		if (!this.#scrollingTo) this.step = id
+	}
+
+	settle() {
+		clearTimeout(this.#settle)
+		this.#scrollingTo = null
 	}
 
 	next = () => {

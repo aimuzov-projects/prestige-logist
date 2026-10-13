@@ -23,7 +23,7 @@
 	<!-- Значок вне label: иначе щелчок по нему уводил бы фокус в поле. -->
 	<div class="field__head">
 		<label class="field__label" for={id}>
-			{label}{#if missing}<span class="missing-mark" title="Не заполнено"></span>{/if}
+			{label}{#if missing}<span class="missing-mark" title="Не заполнено"></span>{/if}
 		</label>
 		{#if hint}<InfoTip text={hint} />{/if}
 	</div>

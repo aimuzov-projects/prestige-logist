@@ -28,6 +28,7 @@
 -->
 <span class="tip">
 	<button
+		tabindex="-1"
 		type="button"
 		class="tip__button"
 		aria-label="Пояснение"
@@ -82,6 +83,7 @@
 			line-height: 1.45;
 			color: var(--fg);
 			text-transform: none;
+			text-wrap: pretty;
 			letter-spacing: normal;
 			background: var(--bg);
 			box-shadow: var(--shadow-md);

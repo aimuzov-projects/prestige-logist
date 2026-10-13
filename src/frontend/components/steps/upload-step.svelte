@@ -1,4 +1,6 @@
 <script lang="ts">
+	import BookOpen from '@lucide/svelte/icons/book-open'
+	import Download from '@lucide/svelte/icons/download'
 	import FileCheck from '@lucide/svelte/icons/file-check-corner'
 	import FolderOpen from '@lucide/svelte/icons/folder-open'
 	import Sparkles from '@lucide/svelte/icons/sparkles'
@@ -41,7 +43,7 @@
 	async function tryDemo() {
 		const response = await fetch(DEMO)
 		if (!response.ok) {
-			wizard.analyzeError = `Пример не загрузился: ${response.status}`
+			wizard.analyzeError = `Пример не загрузился: ${response.status}`
 			return
 		}
 		take(new File([await response.blob()], DEMO.split('/').pop() ?? ''))
@@ -111,12 +113,18 @@
 
 		<div class="upload__demo">
 			<p class="upload__demo-text">
-				<span class="upload__demo-title">Нет комплекта под рукой?</span>
-				Откройте пример — синтетическое поручение, на нём видно все шаги. Или
-				<a class="upload__demo-link" href={DEMO} download>скачайте архив</a>, чтобы загрузить его сами.
-				<a class="upload__demo-link" href="/about">Как это работает</a>
+				<span class="upload__demo-title">Нет комплекта под рукой?</span>
+				Откройте пример — синтетическое поручение, на нём видно все шаги. Или
+				<a class="upload__demo-link" href={DEMO} download tabindex="-1"
+					><Download class="upload__demo-icon" size={14} />скачайте архив</a
+				>, чтобы загрузить его сами.
+				<!-- Отдельной строкой: это не продолжение фразы про пример, а ссылка на справку. -->
+				<a class="upload__demo-link upload__demo-link--more" href="/about" tabindex="-1">
+					<BookOpen size={14} />
+					Как это работает
+				</a>
 			</p>
-			<Button variant="outline" size="lg" disabled={wizard.analyzing} onclick={tryDemo}>
+			<Button variant="outline" size="lg" tabindex={-1} disabled={wizard.analyzing} onclick={tryDemo}>
 				<Sparkles size={16} />
 				Открыть пример
 			</Button>
@@ -244,6 +252,7 @@
 
 		&__demo-text {
 			color: var(--muted);
+			text-wrap: pretty;
 		}
 
 		&__demo-title {
@@ -252,9 +261,25 @@
 			color: var(--fg);
 		}
 
+		/* Ссылка — короткая фраза («Как это работает», «скачайте архив»): переносить её целиком. */
 		&__demo-link {
 			color: var(--accent);
 			text-underline-offset: 2px;
+			white-space: nowrap;
+		}
+
+		/* Значок внутри строки текста: опущен к середине строчных букв. */
+		& :global(.upload__demo-icon) {
+			margin-inline-end: 0.25rem;
+			vertical-align: -0.125em;
+		}
+
+		&__demo-link--more {
+			display: flex;
+			gap: 0.375rem;
+			align-items: center;
+			width: fit-content;
+			margin-top: 0.5rem;
 		}
 
 		&__summary {

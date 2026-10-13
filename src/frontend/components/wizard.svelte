@@ -2,13 +2,17 @@
 	import Check from '@lucide/svelte/icons/check'
 	import CircleHelp from '@lucide/svelte/icons/circle-help'
 	import ClipboardList from '@lucide/svelte/icons/clipboard-list'
+	import Download from '@lucide/svelte/icons/download'
 	import FileInput from '@lucide/svelte/icons/file-input'
+	import LoaderCircle from '@lucide/svelte/icons/loader-circle'
 	import RouteIcon from '@lucide/svelte/icons/route'
 	import Truck from '@lucide/svelte/icons/truck'
 
 	import MissingList from '#frontend/components/missing-list.svelte'
 	import Logo from '#frontend/components/logo.svelte'
 	import StepNav from '#frontend/components/step-nav.svelte'
+	import Button from '#frontend/components/ui/button.svelte'
+	import Toast from '#frontend/components/ui/toast.svelte'
 	import ThemeToggle from '#frontend/components/theme-toggle.svelte'
 	import CarrierStep from '#frontend/components/steps/carrier-step.svelte'
 	import RequestStep from '#frontend/components/steps/request-step.svelte'
@@ -24,8 +28,9 @@
 
 	wizard.connect()
 
-	const View = $derived(VIEWS[wizard.step])
 	const loaded = $derived(Boolean(wizard.order))
+	/** До загрузки поручения заполнять нечего — видно только первый раздел. */
+	const sections = $derived(loaded ? STEPS : STEPS.slice(0, 1))
 	const current = $derived(STEPS[wizard.stepIndex])
 
 	/** Подложка шапке нужна, только когда под неё уехал контент. */
@@ -38,54 +43,65 @@
 		if (id === 'upload') return loaded ? wizard.fileName : 'zip или xml'
 		if (!loaded || !input || !wizard.order) return 'После загрузки'
 		if (id === 'carrier')
-			return wizard.carrierName || (input.carrier.inn ? `ИНН ${input.carrier.inn}` : 'Не выбран')
+			return wizard.carrierName || (input.carrier.inn ? `ИНН ${input.carrier.inn}` : 'Не выбран')
 		if (id === 'route') {
 			const from = city(input.loadingAddress ?? wizard.order.loadingAddress)
 			const to = city(input.unloadingAddress ?? wizard.order.unloadingAddress)
-			return from || to ? `${from || '?'} → ${to || '?'}` : 'Адреса не выбраны'
+			return from || to ? `${from || '?'} → ${to || '?'}` : 'Адреса не выбраны'
 		}
-		return input.orderNumber?.trim() ? `Заказ № ${input.orderNumber.trim()}` : 'Без номера заказа'
+		return input.orderNumber?.trim() ? `Заказ № ${input.orderNumber.trim()}` : 'Без номера заказа'
 	}
 
 	/** Город для строки маршрута; у адреса из 1С — первая часть строки. */
 	const city = (address?: FiasAddress) =>
 		address?.locality?.name ?? address?.municipalDistrict?.name ?? address?.text?.split(',')[0].trim() ?? ''
 
-	/** Стрелки по вкладкам, как у обычного tablist: закрытые шаги пропускаем. */
-	function onKeydown(event: KeyboardEvent) {
-		const shift = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[event.key]
-		if (!shift) return
-		event.preventDefault()
-		const reachable = STEPS.filter(({ id }) => id === 'upload' || loaded)
-		const index = reachable.findIndex(({ id }) => id === wizard.step)
-		const target: StepId = reachable[(index + shift + reachable.length) % reachable.length].id
-		wizard.goTo(target)
-		document.getElementById(`tab-${target}`)?.focus()
+	/**
+	 * Какой раздел сейчас на экране: последний, чей верх ушёл под шапку. У самого низа
+	 * страницы — последний раздел, даже короткий: до верха ему не доехать.
+	 */
+	function onScroll() {
+		const root = document.documentElement
+		const atBottom = window.innerHeight + window.scrollY >= root.scrollHeight - 2
+		if (atBottom) return wizard.spy(sections[sections.length - 1].id)
+		const line = parseFloat(getComputedStyle(root).fontSize) * 7
+		let current: StepId = sections[0].id
+		for (const { id } of sections) {
+			const top = document.getElementById(`step-${id}`)?.getBoundingClientRect().top
+			if (top !== undefined && top <= line) current = id
+		}
+		wizard.spy(current)
 	}
 </script>
 
 <!--
-	Шаги как вкладки: переключаться можно в любом порядке, а не только вперёд. На широком
-	экране они стоят столбцом слева и видны всё время, вместе со статусом каждого; на узком
-	сворачиваются в ленту над формой. Кнопки «Назад/Дальше» живут в липкой шапке: стоят на
-	одном месте на любом шаге и не уезжают при прокрутке длинной карточки.
+	Форма одна длинная, шаги — её разделы подряд. Сайдбар и «Назад/Дальше» не переключают
+	экран, а прокручивают к разделу; при обычной прокрутке сайдбар и шапка сами показывают,
+	какой раздел перед глазами. На широком экране шаги стоят столбцом слева, на узком
+	сворачиваются в ленту над формой.
 -->
-<svelte:window bind:scrollY />
+<svelte:window bind:scrollY onscroll={onScroll} onscrollend={() => wizard.settle()} />
 
 <div class="wizard">
 	<header class={['wizard__header', scrolled && 'wizard__header--stuck']}>
 		<div class="container wizard__header-inner">
 			<!-- Угол над шагами: заголовок шага стоит над формой, а здесь — переключатель темы. -->
 			<div class="wizard__corner">
-				<Logo href="/about" label="Логист — о проекте" wordmark="wide" />
-				<a href="/about" class="wizard__help" aria-label="Как это работает" title="Как это работает">
+				<Logo skipTab href="/about" label="Логист — о проекте" wordmark="wide" />
+				<a
+					href="/about"
+					tabindex="-1"
+					class="wizard__help"
+					aria-label="Как это работает"
+					title="Как это работает"
+				>
 					<CircleHelp size={14} />
 				</a>
 				<span class="wizard__spacer"></span>
-				<ThemeToggle />
+				<span class="wizard__theme"><ThemeToggle skipTab /></span>
 			</div>
 			<div class="wizard__heading">
-				<p class="wizard__count">Шаг {wizard.stepIndex + 1} из {STEPS.length}</p>
+				<p class="wizard__count">Шаг {wizard.stepIndex + 1} из {STEPS.length}</p>
 				<h1 class="wizard__title">{current.title}</h1>
 			</div>
 			<StepNav />
@@ -94,14 +110,7 @@
 
 	<div class="container wizard__layout">
 		<aside class="wizard__aside">
-			<div
-				class="wizard__steps"
-				role="tablist"
-				aria-orientation="vertical"
-				aria-label="Шаги"
-				tabindex="-1"
-				onkeydown={onKeydown}
-			>
+			<nav class="wizard__steps" aria-label="Разделы заявки">
 				{#each STEPS as item (item.id)}
 					{@const gaps = wizard.missingByStep[item.id] ?? 0}
 					{@const active = item.id === wizard.step}
@@ -111,11 +120,9 @@
 					<button
 						id={`tab-${item.id}`}
 						type="button"
-						role="tab"
+						tabindex="-1"
 						class={['wizard__step', active && 'wizard__step--active']}
-						aria-selected={active}
-						aria-controls="wizard-panel"
-						tabindex={active ? 0 : -1}
+						aria-current={active ? 'step' : undefined}
 						disabled={item.id !== 'upload' && !loaded}
 						onclick={() => wizard.goTo(item.id)}
 					>
@@ -137,16 +144,36 @@
 						</span>
 					</button>
 				{/each}
-			</div>
+			</nav>
 			<MissingList />
 		</aside>
 
 		<main class="wizard__main">
-			<div id="wizard-panel" class="wizard__panel" role="tabpanel" aria-labelledby={`tab-${wizard.step}`}>
-				<View />
-			</div>
+			{#each sections as item (item.id)}
+				{@const View = VIEWS[item.id]}
+				<!-- Своего заголовка у раздела нет: название уже в шапке, читалкам его даёт aria-label. -->
+				<section id={`step-${item.id}`} class="wizard__section" aria-label={item.title}>
+					<View />
+				</section>
+			{/each}
+
+			<!-- Скачивание — в конце формы, куда приходишь, заполнив всё сверху вниз. -->
+			{#if loaded}
+				<div class="wizard__finish">
+					<Button size="xl" onclick={wizard.tryDownload}>
+						{#if wizard.building}
+							<LoaderCircle class="spin" size={16} />
+						{:else}
+							<Download size={16} />
+						{/if}
+						Скачать заявку
+					</Button>
+				</div>
+			{/if}
 		</main>
 	</div>
+
+	<Toast message={wizard.notice} />
 </div>
 
 <style>
@@ -210,8 +237,17 @@
 			min-width: 0.25rem;
 		}
 
-		/* Маленький «?» вплотную к названию: справка о самом сервисе. На телефоне место в шапке
-		   нужнее шагу — туда ведёт ссылка на первом шаге. */
+		/* На телефоне в шапке место нужнее шагу и навигации: тема там просто как в системе. */
+		&__theme {
+			display: contents;
+
+			@media (--below-sm) {
+				display: none;
+			}
+		}
+
+		/* Маленький «?» вплотную к названию: справка о самом сервисе. Где названия нет, нет и его:
+		   туда ведёт ссылка на первом шаге. */
 		&__help {
 			display: inline-flex;
 			align-items: center;
@@ -224,7 +260,7 @@
 				background-color 0.15s,
 				color 0.15s;
 
-			@media (--below-sm) {
+			@media (--below-md) {
 				display: none;
 			}
 
@@ -404,10 +440,13 @@
 			}
 		}
 
+		/* Между разделами — заметно больше, чем между островами внутри раздела. */
 		&__main {
 			display: flex;
 			flex-direction: column;
+			gap: 2.5rem;
 			min-width: 0;
+			padding-bottom: 2.5rem;
 		}
 
 		&__heading {
@@ -430,6 +469,7 @@
 			font-weight: 650;
 			line-height: 1.25;
 			text-overflow: ellipsis;
+			text-wrap: balance;
 			letter-spacing: -0.025em;
 			white-space: nowrap;
 
@@ -438,9 +478,19 @@
 			}
 		}
 
-		&__panel {
-			flex: 1;
-			padding-bottom: 2rem;
+		/* Раздел встаёт под шапку, а не под самый край окна: прокрутка к нему учитывает её высоту. */
+		&__finish {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.75rem 1rem;
+			align-items: center;
+		}
+
+		&__section {
+			scroll-margin-top: calc(var(--header) + var(--space));
+			display: flex;
+			flex-direction: column;
+			gap: var(--space);
 		}
 	}
 </style>

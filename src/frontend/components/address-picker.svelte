@@ -8,6 +8,7 @@
 	import Skeleton from '#frontend/components/ui/skeleton.svelte'
 	import SummaryBox from '#frontend/components/ui/summary-box.svelte'
 	import { api, later } from '#frontend/lib/api.ts'
+	import { enterList, moveInList } from '#frontend/lib/list-keys.ts'
 	import { wizard, type AddressTarget } from '#frontend/lib/wizard.svelte.ts'
 
 	type Props = {
@@ -34,6 +35,8 @@
 
 	// svelte-ignore state_referenced_locally
 	let query = $state(initialQuery)
+	let queryInput = $state<HTMLInputElement>()
+	let optionList = $state<HTMLUListElement>()
 	let suggestions = $state<AddressSuggestion[]>([])
 	let searching = $state(false)
 	let error = $state('')
@@ -89,7 +92,9 @@
 			placeholder="Индекс, город, улица, дом"
 			aria-label={label ? `Поиск: ${label.toLowerCase()}` : 'Поиск адреса'}
 			{autofocus}
+			bind:this={queryInput}
 			bind:value={query}
+			onkeydown={(event) => enterList(event, optionList)}
 		/>
 	</div>
 
@@ -105,16 +110,22 @@
 			{/each}
 		</ul>
 	{:else if suggestions.length || query.trim().length >= 3}
-		<ul class="address__list">
+		<!-- Сам список из Tab убран: прокручиваемый блок Chrome иначе выделяет целиком. -->
+		<ul class="address__list" tabindex="-1" bind:this={optionList}>
 			{#each suggestions as item (item.label)}
 				<li class="address__item">
-					<button type="button" class="address__option" onclick={() => apply(item.address)}>
+					<button
+						type="button"
+						class="address__option"
+						onclick={() => apply(item.address)}
+						onkeydown={(event) => moveInList(event, queryInput)}
+					>
 						<MapPin class="address__option-pin" size={14} />
 						{item.label}
 					</button>
 				</li>
 			{:else}
-				<li class="address__item address__option address__option--empty">Ничего не нашлось</li>
+				<li class="address__item address__option address__option--empty">Ничего не нашлось</li>
 			{/each}
 		</ul>
 	{/if}
@@ -127,7 +138,7 @@
 <div class="address">
 	{#if label}
 		<p class="address__label">
-			{label}{#if missing}<span class="missing-mark" title="Не заполнено"></span>{/if}
+			{label}{#if missing}<span class="missing-mark" title="Не заполнено"></span>{/if}
 		</p>
 	{/if}
 
@@ -140,7 +151,7 @@
 				<p>
 					{addressToText(address)}
 					{#if missing}<InfoTip
-							text="У адреса нет кода ФИАС, а без него заявку не примут. Нажмите «Изменить» и выберите адрес из подсказок."
+							text="У адреса нет кода ФИАС, а без него заявку не примут. Нажмите «Изменить» и выберите адрес из подсказок."
 						/>{/if}
 				</p>
 			{/snippet}
@@ -212,6 +223,13 @@
 
 			&:hover {
 				background: var(--hover-bg);
+			}
+
+			/* Список прокручивается и обрезает внешнюю рамку — фокус рисуем внутри строки. */
+			&:focus-visible {
+				background: var(--hover-bg);
+				outline: none;
+				box-shadow: inset 0 0 0 2px var(--ring);
 			}
 
 			&--empty {

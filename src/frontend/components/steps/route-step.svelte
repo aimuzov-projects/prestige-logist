@@ -20,7 +20,7 @@
 	}
 
 	const TEXT_ADDRESS =
-		'В поручении адрес пришёл строкой, без кода ФИАС. Он уже в поиске — выберите подходящий вариант.'
+		'В поручении адрес пришёл строкой, без кода ФИАС. Он уже в поиске — выберите подходящий вариант.'
 
 	/** Обе точки маршрута устроены одинаково: адрес и дата. */
 	const POINTS = [
@@ -30,8 +30,8 @@
 			icon: PackagePlus,
 			address: 'loadingAddress',
 			date: 'loadingDate',
-			dateLabel: 'Дата подачи и погрузки',
-			hint: `Подставлена первая дата отгрузки из поручения. Время в заявке — ${DEFAULT_TIME.slice(0, 5)}`,
+			dateLabel: 'Дата подачи и погрузки',
+			hint: `Подставлена первая дата отгрузки из поручения. Время в заявке — ${DEFAULT_TIME.slice(0, 5)}`,
 		},
 		{
 			key: 'unloading',
@@ -40,7 +40,7 @@
 			address: 'unloadingAddress',
 			date: 'unloadingDate',
 			dateLabel: 'Дата выгрузки',
-			hint: 'Подставлена первая дата доставки из поручения. Часовой пояс возьмём по адресу выгрузки',
+			hint: 'Подставлена первая дата доставки из поручения. Часовой пояс возьмём по адресу выгрузки',
 		},
 	] as const
 </script>
@@ -61,7 +61,7 @@
 				<!-- Дата — в шапке карточки: адресу нужна вся ширина, а дате хватает угла. -->
 				{#snippet action()}
 					<label class="route__date-label" for={`${point.key}-date`}>
-						Дата{#if dateMissing}<span class="missing-mark" title="Не заполнено"></span>{/if}
+						Дата{#if dateMissing}<span class="missing-mark" title="Не заполнено"></span>{/if}
 					</label>
 					<input
 						autocomplete="off"

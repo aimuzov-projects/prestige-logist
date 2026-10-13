@@ -2,7 +2,7 @@
 import Base from '#frontend/layouts/base.astro'
 ---
 
-<Base title="Страница не найдена" description="Такой страницы на сайте нет." index={false}>
+<Base title="Страница не найдена" description="Такой страницы на сайте нет." index={false}>
 	<div class="missing">
 		<main class="missing__main">
 			<div class="container missing__body">
@@ -22,13 +22,13 @@ import Base from '#frontend/layouts/base.astro'
 					404
 				</p>
 				<h1 class="missing__title">Такой страницы нет</h1>
-				<p class="missing__text">Возможно, ссылка устарела или в ней опечатка.</p>
+				<p class="missing__text">Возможно, ссылка устарела или в ней опечатка.</p>
 				<a href="/" class="missing__home">
 					<svg class="missing__glyph" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
 						<path d="m12 19-7-7 7-7"></path>
 						<path d="M19 12H5"></path>
 					</svg>
-					На главную
+					На главную
 				</a>
 			</div>
 		</main>
@@ -91,6 +91,7 @@ import Base from '#frontend/layouts/base.astro'
 			font-size: 1.75rem;
 			font-weight: 650;
 			line-height: 1.2;
+			text-wrap: balance;
 			letter-spacing: -0.025em;
 		}
 

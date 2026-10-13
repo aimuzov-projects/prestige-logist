@@ -25,6 +25,7 @@
 <span class="copy">
 	<span class="copy__label">{label}</span>
 	<button
+		tabindex="-1"
 		type="button"
 		class={['copy__button', copied && 'copy__button--done']}
 		title={copied ? 'Скопировано' : `Скопировать ${label}`}
