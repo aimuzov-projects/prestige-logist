@@ -109,6 +109,9 @@ export const ADDRESS_FIELDS = ADDRESS_LEVELS.map(({ key, label, partLabels, many
 /** Текстовый адрес из 1С в ФИАС не превратить — он живёт только в сводке. */
 export const isTextOnly = (address?: FiasAddress) => Boolean(address?.text)
 
+/** «д» и «д.» приходят вперемешку: из поручения с точкой, из справочника без. */
+const abbr = (type?: string) => `${type?.replace(/\.$/, '')}.`
+
 export function addressToText(address: FiasAddress = {}): string {
 	if (address.text) return address.text
 	const parts = [
@@ -116,8 +119,8 @@ export function addressToText(address: FiasAddress = {}): string {
 		address.municipalDistrict?.name,
 		address.locality && `${address.locality.kind} ${address.locality.name}`,
 		address.street && `${address.street.type} ${address.street.name}`,
-		...(address.buildings ?? []).map((b) => `${b.type}. ${b.number}`),
-		...(address.premises ?? []).map((p) => `${p.type}. ${p.number}`),
+		...(address.buildings ?? []).map((b) => `${abbr(b.type)} ${b.number}`),
+		...(address.premises ?? []).map((p) => `${abbr(p.type)} ${p.number}`),
 	]
 	return parts.filter(Boolean).join(', ')
 }
