@@ -79,7 +79,7 @@
 </script>
 
 {#snippet search(autofocus: boolean)}
-	<div class="address__search">
+	<div class={['address__search', missing && !filled && 'address__search--missing']}>
 		<Search class="address__search-icon" size={16} />
 		<!-- svelte-ignore a11y_autofocus -->
 		<input
@@ -160,6 +160,11 @@
 				top: 0.75rem;
 				left: 0.75rem;
 				color: var(--muted);
+			}
+
+			/* Иконка в тон подсказке незаполненного поля, см. .input--missing. */
+			&--missing :global(.address__search-icon) {
+				color: color-mix(in oklch, var(--warning) 65%, var(--warning-bg));
 			}
 		}
 

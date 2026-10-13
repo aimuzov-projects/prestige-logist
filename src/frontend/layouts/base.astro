@@ -33,6 +33,8 @@ const canonical = new URL(Astro.url.pathname, Astro.site)
 		<meta property="og:title" content={fullTitle} />
 		<meta property="og:description" content={description} />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<!-- Блокирующий намеренно: тема должна встать до первой отрисовки. -->
+		<script is:inline src="/theme.js"></script>
 		<slot name="head" />
 	</head>
 	<body>

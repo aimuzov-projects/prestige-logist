@@ -7,60 +7,54 @@
 	--radius: 0.75rem;
 	--radius-sm: 0.5rem;
 
-	/* Нейтрали чуть холодные: оттенок бренда, едва заметный, снимает «серость» чистого серого. */
-	--canvas: oklch(97.6% 0.004 262);
-	--bg: oklch(100% 0 0);
-	--fg: oklch(20% 0.02 262);
-	--muted: oklch(52% 0.02 262);
-	--surface: oklch(96% 0.006 262);
-	--border: oklch(91.5% 0.008 262);
-	--border-strong: oklch(84% 0.012 262);
+	/*
+	 * Каждый цвет — пара «светлый, тёмный»: light-dark() берёт нужный по color-scheme.
+	 * Так тему переключает одно свойство на <html>, а не второй набор токенов.
+	 * Нейтрали чуть холодные: оттенок бренда снимает «серость» чистого серого.
+	 */
+	--canvas: light-dark(oklch(97.6% 0.004 262), oklch(16% 0.012 262));
+	--bg: light-dark(oklch(100% 0 0), oklch(20.5% 0.014 262));
+	--fg: light-dark(oklch(20% 0.02 262), oklch(94% 0.008 262));
+	--muted: light-dark(oklch(52% 0.02 262), oklch(68% 0.02 262));
+	--surface: light-dark(oklch(96% 0.006 262), oklch(25% 0.016 262));
+	--border: light-dark(oklch(91.5% 0.008 262), oklch(29% 0.016 262));
+	--border-strong: light-dark(oklch(84% 0.012 262), oklch(37% 0.02 262));
 
-	--brand: oklch(52% 0.2 265);
+	--brand: light-dark(oklch(52% 0.2 265), oklch(62% 0.18 265));
 	--brand-fg: oklch(99% 0 0);
-	--brand-soft: oklch(95% 0.03 265);
-	--brand-text: oklch(46% 0.2 265);
+	--brand-soft: light-dark(oklch(95% 0.03 265), oklch(30% 0.07 265));
+	--brand-text: light-dark(oklch(46% 0.2 265), oklch(76% 0.13 265));
 	--primary: var(--brand);
 	--primary-fg: var(--brand-fg);
 	--accent: var(--brand-text);
 	--ring: color-mix(in oklch, var(--brand) 55%, transparent);
 
-	--danger: oklch(55% 0.22 27);
-	--danger-bg: oklch(96.5% 0.02 27);
-	--success: oklch(55% 0.14 163);
-	--success-bg: oklch(95.5% 0.045 163);
-	--warning: oklch(55% 0.15 60);
-	--warning-bg: oklch(97.5% 0.03 85);
+	--danger: light-dark(oklch(55% 0.22 27), oklch(70% 0.17 25));
+	--danger-bg: light-dark(oklch(96.5% 0.02 27), oklch(27% 0.06 25));
+	--success: light-dark(oklch(55% 0.14 163), oklch(74% 0.14 163));
+	--success-bg: light-dark(oklch(95.5% 0.045 163), oklch(27% 0.05 163));
+	--warning: light-dark(oklch(55% 0.15 60), oklch(80% 0.13 75));
+	--warning-bg: light-dark(oklch(97.5% 0.03 85), oklch(29% 0.05 75));
 
-	--shadow-sm: 0 1px 2px oklch(20% 0.02 262 / 6%), 0 1px 1px oklch(20% 0.02 262 / 3%);
-	--shadow-md: 0 8px 24px -6px oklch(20% 0.02 262 / 14%), 0 2px 6px oklch(20% 0.02 262 / 6%);
+	/* Тени на тёмном не видны: там карточку отделяют светлая кромка сверху и сам тон. */
+	--shadow-sm:
+		inset 0 1px 0 light-dark(transparent, oklch(100% 0 0 / 4%)),
+		0 1px 2px light-dark(oklch(20% 0.02 262 / 6%), transparent),
+		0 1px 1px light-dark(oklch(20% 0.02 262 / 3%), transparent);
+	--shadow-md:
+		inset 0 1px 0 light-dark(transparent, oklch(100% 0 0 / 5%)),
+		0 8px 24px -6px light-dark(oklch(20% 0.02 262 / 14%), oklch(0% 0 0 / 60%)),
+		0 2px 6px light-dark(oklch(20% 0.02 262 / 6%), transparent);
 
+	/* По умолчанию — как в системе. Выбор из переключателя кладёт data-theme на <html>. */
 	color-scheme: light dark;
 
-	/* Тени на тёмном не видны: карточку отделяют светлая кромка сверху и сам тон. */
-	@media (prefers-color-scheme: dark) {
-		--canvas: oklch(16% 0.012 262);
-		--bg: oklch(20.5% 0.014 262);
-		--fg: oklch(94% 0.008 262);
-		--muted: oklch(68% 0.02 262);
-		--surface: oklch(25% 0.016 262);
-		--border: oklch(29% 0.016 262);
-		--border-strong: oklch(37% 0.02 262);
+	&[data-theme='light'] {
+		color-scheme: light;
+	}
 
-		--brand: oklch(62% 0.18 265);
-		--brand-fg: oklch(99% 0 0);
-		--brand-soft: oklch(30% 0.07 265);
-		--brand-text: oklch(76% 0.13 265);
-
-		--danger: oklch(70% 0.17 25);
-		--danger-bg: oklch(27% 0.06 25);
-		--success: oklch(74% 0.14 163);
-		--success-bg: oklch(27% 0.05 163);
-		--warning: oklch(80% 0.13 75);
-		--warning-bg: oklch(29% 0.05 75);
-
-		--shadow-sm: inset 0 1px 0 oklch(100% 0 0 / 4%);
-		--shadow-md: 0 12px 32px -8px oklch(0% 0 0 / 60%), inset 0 1px 0 oklch(100% 0 0 / 5%);
+	&[data-theme='dark'] {
+		color-scheme: dark;
 	}
 }
 

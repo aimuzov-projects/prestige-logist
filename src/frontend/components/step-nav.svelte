@@ -27,17 +27,17 @@
 		{/if}
 		{#if loaded}
 			{#if last}
-				<Button size="lg" disabled={!wizard.canDownload} onclick={wizard.download}>
+				<Button size="lg" aria-label="Скачать" disabled={!wizard.canDownload} onclick={wizard.download}>
 					{#if wizard.building}
 						<LoaderCircle class="spin" size={16} />
 					{:else}
 						<Download size={16} />
 					{/if}
-					Скачать
+					<span class="step-nav__label">Скачать</span>
 				</Button>
 			{:else}
-				<Button size="lg" onclick={wizard.next}>
-					Дальше
+				<Button size="lg" aria-label="Дальше" onclick={wizard.next}>
+					<span class="step-nav__label">Дальше</span>
 					<ArrowRight size={16} />
 				</Button>
 			{/if}
@@ -51,7 +51,7 @@
 		gap: 0.5rem;
 		align-items: center;
 
-		/* На телефоне в шапке тесно: у «Назад» остаётся одна стрелка. */
+		/* На телефоне в шапке тесно: у кнопок остаются одни иконки, подписи — в aria-label. */
 		&__label {
 			@media (--below-sm) {
 				display: none;

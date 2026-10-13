@@ -7,6 +7,7 @@
 
 	import MissingList from '#frontend/components/missing-list.svelte'
 	import StepNav from '#frontend/components/step-nav.svelte'
+	import ThemeToggle from '#frontend/components/theme-toggle.svelte'
 	import CarrierStep from '#frontend/components/steps/carrier-step.svelte'
 	import RequestStep from '#frontend/components/steps/request-step.svelte'
 	import RouteStep from '#frontend/components/steps/route-step.svelte'
@@ -72,20 +73,10 @@
 <div class="wizard">
 	<header class={['wizard__header', scrolled && 'wizard__header--stuck']}>
 		<div class="container wizard__header-inner">
-			<p class="wizard__brand">
-				<svg class="wizard__logo" viewBox="0 0 32 32" aria-hidden="true">
-					<rect width="32" height="32" rx="8" fill="currentColor" />
-					<path
-						d="M9 16h13m-5-5 5 5-5 5"
-						fill="none"
-						stroke="white"
-						stroke-width="2.5"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-					/>
-				</svg>
-				<span class="wizard__product">Поручение → заявка</span>
-			</p>
+			<!-- Угол над шагами: заголовок шага стоит над формой, а здесь — переключатель темы. -->
+			<div class="wizard__corner">
+				<ThemeToggle />
+			</div>
 			<div class="wizard__heading">
 				<p class="wizard__count">Шаг {wizard.stepIndex + 1} из {STEPS.length}</p>
 				<h1 class="wizard__title">{current.title}</h1>
@@ -188,7 +179,7 @@
 		&__header-inner {
 			display: grid;
 			grid-template-columns: auto minmax(0, 1fr) auto;
-			gap: 0.75rem;
+			gap: 0.5rem;
 			align-items: center;
 			height: var(--header);
 
@@ -198,24 +189,13 @@
 			}
 		}
 
-		&__brand {
+		/* На широком экране угол над шагами, на узком — просто первая кнопка в строке. */
+		&__corner {
 			display: flex;
-			gap: 0.625rem;
-			align-items: center;
-			font-weight: 600;
-			letter-spacing: -0.01em;
-		}
+			margin-left: -0.75rem;
 
-		&__logo {
-			width: 1.5rem;
-			height: 1.5rem;
-			color: var(--brand);
-		}
-
-		/* На узком экране место в шапке нужнее шагу, хватит одного знака. */
-		&__product {
-			@media (--below-md) {
-				display: none;
+			@media (--md) {
+				margin-left: 0;
 			}
 		}
 
