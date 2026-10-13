@@ -13,7 +13,7 @@ const order = parseForwardingOrder({ client: CLIENT_TITLE, forwarder: FORWARDER_
 test('разбор поручения', () => {
 	assert.equal(order.number, 'П-17')
 	assert.equal(order.senderBox, '2BM-EXP')
-	assert.equal(order.forwarder.inn, '6300000002')
+	assert.equal(order.forwarder.inn, '5200000002')
 	assert.equal(order.cargo.grossWeight, '1500')
 	assert.equal(order.loadingAddress.fiasId, 'fias-loading')
 	assert.deepEqual(order.unloadingAddress, { text: 'Москва, Тверская, 1' })
@@ -25,7 +25,7 @@ test('текстовый адрес в форму не попадает, а зн
 	assert.equal(input.unloadingAddress, undefined)
 	assert.deepEqual(
 		missingFields(input).map(({ path }) => path),
-		['orderNumber', 'carrier.inn', 'carrier.name', 'carrier.address', 'unloadingAddress'],
+		['carrier.inn', 'carrier.name', 'carrier.address', 'unloadingAddress', 'orderNumber'],
 	)
 })
 
@@ -48,7 +48,7 @@ test('сборка заявки', () => {
 	// Пояс у каждой точки свой: Екатеринбург +05, Москва +03.
 	assert.match(xml, /Опер="Погрузка" ПорНомПункт="1" ДатВрОпер="02.09.2026T09:00:00\+05:00"/)
 	assert.match(xml, /Опер="Выгрузка" ПорНомПункт="2" ДатВрОпер="05.09.2026T09:00:00\+03:00"/)
-	assert.match(xml, /НаимВладИнфр="АО «Завод»"/)
+	assert.match(xml, /НаимВладИнфр="АО «Демо Завод»"/)
 	assert.match(xml, /ВидТар="8A"/)
 	assert.match(xml, /ТипПогр="бок"/)
 	assert.match(xml, /<ФИО Фамилия="Петров" Имя="Пётр" Отчество="Петрович" \/>/)

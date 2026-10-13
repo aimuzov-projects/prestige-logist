@@ -11,7 +11,7 @@
 <style>
 	.grid {
 		display: grid;
-		gap: 1rem;
+		gap: 1.25rem 1rem;
 
 		@media (--sm) {
 			&--2 {

@@ -1,10 +1,12 @@
 ---
+import '@fontsource-variable/inter'
 import '#frontend/styles/global.css'
+import SiteFooter from '#frontend/components/site-footer.astro'
 import { site } from '#frontend/data/site.ts'
 import { pageTitle } from '#frontend/lib/title.ts'
 
 type Props = {
-	/** Название страницы, к нему добавится название сайта. У главной не задаётся. */
+	/** Название страницы, к нему добавится название сайта. Без него — одно название сайта. */
 	title?: string
 	/** `meta description` и `og:description`, по умолчанию `site.description`. */
 	description?: string
@@ -32,9 +34,12 @@ const canonical = new URL(Astro.url.pathname, Astro.site)
 		<meta property="og:title" content={fullTitle} />
 		<meta property="og:description" content={description} />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<!-- Блокирующий намеренно: тема должна встать до первой отрисовки. -->
+		<script is:inline src="/theme.js"></script>
 		<slot name="head" />
 	</head>
 	<body>
 		<slot />
+		<SiteFooter />
 	</body>
 </html>

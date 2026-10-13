@@ -8,6 +8,7 @@
 
 import { api, later } from '#frontend/lib/api.ts'
 import type { AnalyzeResponse, BuildResponse } from '#shared/api.ts'
+import { missingFields } from '#shared/fields.ts'
 import type { ForwardingOrder } from '#shared/order.ts'
 import type { Carrier, OrderSummary, RequestInput } from '#shared/request.ts'
 
@@ -42,8 +43,14 @@ class Wizard {
 	request = $state<BuildResponse>(EMPTY)
 	building = $state(false)
 	buildError = $state('')
-	missing = $derived(this.request.missing)
+	/**
+	 * Пропуски считаем здесь же, по тем же правилам, что и сервер: ответа сборки ждать
+	 * незачем, а с ним подсветка отставала от правки на паузу и запрос.
+	 */
+	missing = $derived(this.input ? missingFields(this.input) : [])
 	isComplete = $derived(Boolean(this.order) && this.missing.length === 0)
+	/** Пути незаполненного, вроде `carrier.inn`: по ним форма подсвечивает свои поля. */
+	missingPaths = $derived(new Set(this.missing.map((field) => field.path)))
 
 	/** Сколько незаполненного осталось на каждом шаге — показываем прямо на вкладках. */
 	missingByStep = $derived.by(() => {
@@ -54,8 +61,59 @@ class Wizard {
 
 	/** Имя файла заявки: по номеру заказа, а без него — просто черновик. */
 	downloadName = $derived(`zayavka-${this.input?.orderNumber?.trim() || 'draft'}.xml`)
+	canDownload = $derived(this.isComplete && !this.building && Boolean(this.request.file))
+
+	/** Короткое сообщение внизу экрана; гаснет само. */
+	notice = $state('')
+	#noticeTimer: ReturnType<typeof setTimeout> | undefined
+
+	notify(text: string) {
+		this.notice = text
+		clearTimeout(this.#noticeTimer)
+		this.#noticeTimer = setTimeout(() => (this.notice = ''), 4000)
+	}
+
+	/**
+	 * Кнопка «Скачать заявку» не гаснет: нажали раньше времени — объясняем, чего не хватает,
+	 * и ведём к разделу с первым пропуском.
+	 */
+	tryDownload = () => {
+		const missing = this.missing
+		if (missing.length) {
+			const names = missing.slice(0, 3).map((field) => field.label)
+			const rest = missing.length - names.length
+			this.notify(`Заполните: ${names.join(', ')}${rest > 0 ? ` и ещё ${rest}` : ''}`)
+			this.goTo(missing[0].step)
+			return
+		}
+		if (!this.canDownload) {
+			this.notify('Собираем заявку, нажмите через секунду')
+			return
+		}
+		this.download()
+	}
+
+	/**
+	 * Файл отдаём ровно теми байтами, что собрал сервер: windows-1251, иначе Логистика
+	 * его не прочтёт. Пересобирать в браузере нечего — base64 уже пришёл готовым.
+	 */
+	download = () => {
+		if (!this.canDownload) return
+		const bytes = Uint8Array.from(atob(this.request.file), (char) => char.charCodeAt(0))
+		const url = URL.createObjectURL(new Blob([bytes], { type: 'application/xml' }))
+		Object.assign(document.createElement('a'), { href: url, download: this.downloadName }).click()
+		URL.revokeObjectURL(url)
+	}
 
 	carrierInn = $derived(this.input?.carrier.inn?.trim())
+	/** Как перевозчика называть людям: наименование юрлица или ФИО предпринимателя. */
+	carrierName = $derived.by(() => {
+		const carrier = this.input?.carrier
+		if (carrier?.kind === 'ИП') {
+			return [carrier.lastName, carrier.firstName, carrier.middleName].filter(Boolean).join(' ')
+		}
+		return carrier?.name?.trim() ?? ''
+	})
 	/** Реквизиты, найденные по ИНН; null — не искали или в реестре нет. */
 	carrierFound = $state<Carrier | null>(null)
 	carrierSearching = $state(false)
@@ -84,9 +142,33 @@ class Wizard {
 		}
 	}
 
+	/**
+	 * Раздел, к которому сейчас едет прокрутка. Пока едет, слежение за экраном молчит:
+	 * иначе подсветка в сайдбаре перебрала бы все разделы по пути.
+	 */
+	#scrollingTo: StepId | null = null
+	#settle: ReturnType<typeof setTimeout> | undefined
+
+	/** Форма одна длинная: шаг — это раздел, к которому прокручиваем. */
 	goTo(id: StepId) {
 		if (id !== 'upload' && !this.order) return
 		this.step = id
+		this.#scrollingTo = id
+		const still = matchMedia('(prefers-reduced-motion: reduce)').matches
+		document.getElementById(`step-${id}`)?.scrollIntoView({ behavior: still ? 'auto' : 'smooth', block: 'start' })
+		// scrollend есть не везде, поэтому слежение возвращаем и по таймеру.
+		clearTimeout(this.#settle)
+		this.#settle = setTimeout(() => this.settle(), 900)
+	}
+
+	/** Раздел, который сейчас на экране, — от прокрутки самого пользователя. */
+	spy(id: StepId) {
+		if (!this.#scrollingTo) this.step = id
+	}
+
+	settle() {
+		clearTimeout(this.#settle)
+		this.#scrollingTo = null
 	}
 
 	next = () => {

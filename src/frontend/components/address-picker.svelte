@@ -1,14 +1,14 @@
 <script lang="ts">
 	import MapPin from '@lucide/svelte/icons/map-pin'
-	import Pencil from '@lucide/svelte/icons/pencil'
 	import Search from '@lucide/svelte/icons/search'
-	import X from '@lucide/svelte/icons/x'
 
 	import { addressToText, type FiasAddress } from '#shared/address.ts'
 	import type { AddressSuggestion } from '#shared/api.ts'
-	import Badge from '#frontend/components/ui/badge.svelte'
-	import Button from '#frontend/components/ui/button.svelte'
+	import InfoTip from '#frontend/components/ui/info-tip.svelte'
+	import Skeleton from '#frontend/components/ui/skeleton.svelte'
+	import SummaryBox from '#frontend/components/ui/summary-box.svelte'
 	import { api, later } from '#frontend/lib/api.ts'
+	import { enterList, moveInList } from '#frontend/lib/list-keys.ts'
 	import { wizard, type AddressTarget } from '#frontend/lib/wizard.svelte.ts'
 
 	type Props = {
@@ -16,18 +16,27 @@
 		/** Без подписи, когда её роль уже играет заголовок блока — как у точек маршрута. */
 		label?: string
 		address?: FiasAddress
+		/** Обязательный адрес не выбран или выбран без ФИАС. */
+		missing?: boolean
+		/** С чего начать поиск: адрес строкой из поручения, если он там был. */
+		initialQuery?: string
 	}
 
-	let { target, label, address }: Props = $props()
+	let { target, label, address, missing = false, initialQuery = '' }: Props = $props()
 
-	/**
-	 * Поиск открыт всегда ровно у одного адреса формы, поэтому его состояние живёт
-	 * в самом пикере, а в визарде — только то, какой из них открыт.
-	 */
-	const open = $derived(wizard.addressTarget === target)
 	const filled = $derived(Boolean(address && Object.keys(address).length))
 
-	let query = $state('')
+	/**
+	 * Пустой адрес ищем сразу, без лишнего щелчка. Выбранный меняют через «Изменить»,
+	 * и такой поиск открыт ровно у одного адреса формы — это помнит визард.
+	 */
+	const editing = $derived(wizard.addressTarget === target)
+	const searchable = $derived(!filled || editing)
+
+	// svelte-ignore state_referenced_locally
+	let query = $state(initialQuery)
+	let queryInput = $state<HTMLInputElement>()
+	let optionList = $state<HTMLUListElement>()
 	let suggestions = $state<AddressSuggestion[]>([])
 	let searching = $state(false)
 	let error = $state('')
@@ -36,7 +45,7 @@
 		const text = query.trim()
 		suggestions = []
 		error = ''
-		if (!open || text.length < 3) return
+		if (!searchable || text.length < 3) return
 
 		const controller = new AbortController()
 		searching = true
@@ -58,9 +67,9 @@
 		}
 	})
 
-	function toggle() {
+	function setEditing(open: boolean) {
 		query = ''
-		wizard.addressTarget = open ? null : target
+		wizard.addressTarget = open ? target : null
 	}
 
 	/** Выбранный вариант раскладывается по подполям — дальше их можно править руками. */
@@ -69,70 +78,87 @@
 		if (!input) return
 		if (target === 'carrier' || target === 'forwarder') input[target].address = picked
 		else input[target] = picked
-		toggle()
+		setEditing(false)
 	}
 </script>
 
-<div class="address">
-	{#if label}
-		<p class="address__label">{label}</p>
-	{/if}
-
-	<!-- Кнопка равняется по первой строке адреса: длинный адрес переносится,
-	     и по центру она уезжала бы от подписи. -->
-	<div class="address__row">
-		{#if filled}
-			<p class="address__value">
-				<MapPin class="address__pin" size={16} />
-				<span>
-					{addressToText(address)}
-					{#if address?.fiasId}<Badge mono>ФИАС</Badge>{/if}
-				</span>
-			</p>
-		{:else}
-			<p class="address__value address__value--empty">Адрес не выбран</p>
-		{/if}
-
-		<Button variant="outline" size="lg" onclick={toggle}>
-			{#if open}
-				<X size={16} /> Отмена
-			{:else if filled}
-				<Pencil size={16} /> Изменить
-			{:else}
-				<Search size={16} /> Найти
-			{/if}
-		</Button>
+{#snippet search(autofocus: boolean)}
+	<div class={['address__search', missing && !filled && 'address__search--missing']}>
+		<Search class="address__search-icon" size={16} />
+		<!-- svelte-ignore a11y_autofocus -->
+		<input
+			autocomplete="off"
+			class={['input', 'address__query', missing && !filled && 'input--missing']}
+			placeholder="Индекс, город, улица, дом"
+			aria-label={label ? `Поиск: ${label.toLowerCase()}` : 'Поиск адреса'}
+			{autofocus}
+			bind:this={queryInput}
+			bind:value={query}
+			onkeydown={(event) => enterList(event, optionList)}
+		/>
 	</div>
 
-	{#if open}
-		<div class="address__search">
-			<Search class="address__search-icon" size={16} />
-			<!-- svelte-ignore a11y_autofocus -->
-			<input
-				class="input address__query"
-				placeholder="Индекс, город, улица, дом"
-				aria-label="Поиск адреса"
-				autofocus
-				bind:value={query}
-			/>
-		</div>
+	{#if error}<p class="address__error">{error}</p>{/if}
+	{#if searching}
+		<!-- Заготовка списка, пока DaData подбирает варианты: он появится ровно на этом месте. -->
+		<ul class="address__list" role="status" aria-label="Ищем адрес">
+			{#each [70, 55, 80] as width (width)}
+				<li class="address__item address__option address__option--skeleton">
+					<Skeleton width="0.875rem" height="0.875rem" round />
+					<Skeleton width={`${width}%`} />
+				</li>
+			{/each}
+		</ul>
+	{:else if suggestions.length || query.trim().length >= 3}
+		<!-- Сам список из Tab убран: прокручиваемый блок Chrome иначе выделяет целиком. -->
+		<ul class="address__list" tabindex="-1" bind:this={optionList}>
+			{#each suggestions as item (item.label)}
+				<li class="address__item">
+					<button
+						type="button"
+						class="address__option"
+						onclick={() => apply(item.address)}
+						onkeydown={(event) => moveInList(event, queryInput)}
+					>
+						<MapPin class="address__option-pin" size={14} />
+						{item.label}
+					</button>
+				</li>
+			{:else}
+				<li class="address__item address__option address__option--empty">Ничего не нашлось</li>
+			{/each}
+		</ul>
+	{/if}
+{/snippet}
 
-		{#if error}<p class="address__error">{error}</p>{/if}
-		{#if searching}<p class="hint">Ищем…</p>{/if}
+<!--
+	Как у перевозчика: выбранное — плашкой-итогом, правка — в раскрывающемся блоке под ней.
+	Пустой адрес сразу показывает поиск: другого действия с ним всё равно нет.
+-->
+<div class="address">
+	{#if label}
+		<p class="address__label">
+			{label}{#if missing}<span class="missing-mark" title="Не заполнено"></span>{/if}
+		</p>
+	{/if}
 
-		{#if suggestions.length || (!searching && query.trim().length >= 3)}
-			<ul class="address__list">
-				{#each suggestions as item (item.label)}
-					<li class="address__item">
-						<button type="button" class="address__option" onclick={() => apply(item.address)}>
-							{item.label}
-						</button>
-					</li>
-				{:else}
-					<li class="address__item address__option address__option--empty">Ничего не нашлось</li>
-				{/each}
-			</ul>
-		{/if}
+	{#if filled}
+		<SummaryBox id={`address-${target}`} warning={missing} bind:open={() => editing, setEditing}>
+			{#snippet icon()}<MapPin size={16} />{/snippet}
+			{#snippet summary()}
+				<!-- Код ФИАС не подписываем: он есть у любого адреса из подсказок. Жёлтая плашка
+				     и пояснение за «?» — только когда его нет. -->
+				<p>
+					{addressToText(address)}
+					{#if missing}<InfoTip
+							text="У адреса нет кода ФИАС, а без него заявку не примут. Нажмите «Изменить» и выберите адрес из подсказок."
+						/>{/if}
+				</p>
+			{/snippet}
+			{@render search(true)}
+		</SummaryBox>
+	{:else}
+		{@render search(false)}
 	{/if}
 </div>
 
@@ -140,35 +166,11 @@
 	.address {
 		display: flex;
 		flex-direction: column;
-		gap: 0.5rem;
+		gap: 0.625rem;
 
 		&__label {
+			font-size: 0.8125rem;
 			font-weight: 500;
-		}
-
-		&__row {
-			display: flex;
-			gap: 0.75rem;
-			align-items: flex-start;
-		}
-
-		&__value {
-			display: flex;
-			flex: 1;
-			gap: 0.5rem;
-			align-items: flex-start;
-			min-width: 0;
-			padding-block: 0.5rem;
-
-			&--empty {
-				color: var(--muted);
-			}
-
-			:global(.address__pin) {
-				flex-shrink: 0;
-				margin-top: 0.15rem;
-				color: var(--success);
-			}
 		}
 
 		&__search {
@@ -176,14 +178,19 @@
 
 			:global(.address__search-icon) {
 				position: absolute;
-				top: 0.625rem;
-				left: 0.625rem;
+				top: 0.75rem;
+				left: 0.75rem;
 				color: var(--muted);
+			}
+
+			/* Иконка в тон подсказке незаполненного поля, см. .input--missing. */
+			&--missing :global(.address__search-icon) {
+				color: color-mix(in oklch, var(--warning) 65%, var(--warning-bg));
 			}
 		}
 
 		&__query {
-			padding-left: 2rem;
+			padding-left: 2.25rem;
 		}
 
 		&__error {
@@ -191,8 +198,12 @@
 		}
 
 		&__list {
+			overflow-y: auto;
+			max-height: 15rem;
 			border: 1px solid var(--border);
-			border-radius: calc(var(--radius) * 0.8);
+			border-radius: var(--radius-sm);
+			background: var(--bg);
+			box-shadow: var(--shadow-sm);
 		}
 
 		&__item + &__item {
@@ -201,6 +212,9 @@
 
 		&__option {
 			cursor: pointer;
+			display: flex;
+			gap: 0.5rem;
+			align-items: flex-start;
 			width: 100%;
 			padding: 0.5rem 0.75rem;
 			border: 0;
@@ -208,11 +222,35 @@
 			background: none;
 
 			&:hover {
-				background: var(--surface);
+				background: var(--hover-bg);
+			}
+
+			/* Список прокручивается и обрезает внешнюю рамку — фокус рисуем внутри строки. */
+			&:focus-visible {
+				background: var(--hover-bg);
+				outline: none;
+				box-shadow: inset 0 0 0 2px var(--ring);
 			}
 
 			&--empty {
 				cursor: default;
+				color: var(--muted);
+			}
+
+			/* Строка-заготовка ростом с настоящий вариант: список не прыгает, когда данные придут. */
+			&--skeleton {
+				cursor: default;
+				align-items: center;
+				min-height: 2.3rem;
+
+				&:hover {
+					background: none;
+				}
+			}
+
+			:global(.address__option-pin) {
+				flex-shrink: 0;
+				margin-top: 0.2rem;
 				color: var(--muted);
 			}
 		}
