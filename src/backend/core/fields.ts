@@ -8,13 +8,18 @@ export { missingFields } from '#shared/fields.ts'
  */
 export function withPlaceholders(input: RequestInput, missing: MissingField[]): RequestInput {
 	const draft = structuredClone(input)
+
 	for (const field of missing) {
 		if (field.path === 'orderNumber') draft.orderNumber = `[[${field.label}]]`
+
 		if (field.path === 'carrier.name' && draft.carrier.kind === 'ЮЛ') {
 			draft.carrier.name = `[[${field.label}]]`
 		}
+
 		if (field.path === 'loadingDate') draft.loadingDate = `[[${field.label}]]`
+
 		if (field.path === 'unloadingDate') draft.unloadingDate = `[[${field.label}]]`
 	}
+
 	return draft
 }

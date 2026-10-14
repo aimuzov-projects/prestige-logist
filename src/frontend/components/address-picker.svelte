@@ -43,12 +43,16 @@
 
 	$effect(() => {
 		const text = query.trim()
+
 		suggestions = []
 		error = ''
+
 		if (!searchable || text.length < 3) return
 
 		const controller = new AbortController()
+
 		searching = true
+
 		later(300, controller.signal, async () => {
 			try {
 				;({ suggestions } = await api<{ suggestions: AddressSuggestion[] }>(
@@ -61,6 +65,7 @@
 				if (!controller.signal.aborted) searching = false
 			}
 		})
+
 		return () => {
 			controller.abort()
 			searching = false
@@ -75,9 +80,12 @@
 	/** Выбранный вариант раскладывается по подполям — дальше их можно править руками. */
 	function apply(picked: FiasAddress) {
 		const input = wizard.input
+
 		if (!input) return
+
 		if (target === 'carrier' || target === 'forwarder') input[target].address = picked
 		else input[target] = picked
+
 		setEditing(false)
 	}
 </script>

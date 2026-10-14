@@ -17,7 +17,9 @@
 		const right = rect.right - shift
 		const limit = document.documentElement.clientWidth - EDGE
 		let next = right > limit ? limit - right : 0
+
 		if (left + next < EDGE) next = EDGE - left
+
 		shift = next
 	}
 </script>

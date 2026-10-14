@@ -14,6 +14,7 @@ export function decodeXml(buffer: Buffer): string {
 	const withoutBom = BOM_UTF8.every((byte, i) => buffer[i] === byte) ? buffer.subarray(3) : buffer
 	const declaration = withoutBom.subarray(0, 120).toString('latin1')
 	const encoding = declaration.match(/encoding=["']([^"']+)["']/i)?.[1] ?? 'utf-8'
+
 	return iconv.decode(withoutBom, isUtf8(encoding) ? 'utf-8' : encoding)
 }
 
@@ -28,10 +29,12 @@ export function encodeXml(xml: string, encoding: string = REQUEST_ENCODING): Buf
 	if (isUtf8(encoding)) return Buffer.from(xml, 'utf8')
 
 	const bytes = iconv.encode(xml, encoding)
+
 	if (iconv.decode(bytes, encoding) === xml) return bytes
 
 	const survives = (char: string) => iconv.decode(iconv.encode(char, encoding), encoding) === char
 	const broken = [...new Set(xml)].filter((char) => !survives(char))
+
 	throw new Error(
 		`Символы ${broken.map((c) => `«${c}»`).join(', ')} не существуют в ${encoding} ` +
 			'и превратились бы в «?». Замените их на ASCII или кириллицу.',

@@ -26,14 +26,17 @@
 	// На сервере document нет: выбор, уже применённый public/theme.js, читаем в браузере.
 	onMount(() => {
 		const stored = document.documentElement.dataset.theme
+
 		if (stored === 'light' || stored === 'dark') theme = stored
 	})
 
 	function cycle() {
 		theme = NEXT[theme]
 		const root = document.documentElement
+
 		if (theme === 'system') delete root.dataset.theme
 		else root.dataset.theme = theme
+
 		try {
 			if (theme === 'system') localStorage.removeItem(KEY)
 			else localStorage.setItem(KEY, theme)

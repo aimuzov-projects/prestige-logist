@@ -24,15 +24,18 @@ async function party(inn?: string) {
 			cache.set(inn, undefined)
 		}
 	}
+
 	return cache.get(inn)
 }
 
 export async function carrierByInn(inn?: string): Promise<Carrier | undefined> {
 	const found = await party(inn)
+
 	return found ? { ...toCarrier(found), inn } : undefined
 }
 
 export async function forwarderByInn(inn?: string): Promise<ForwarderDetails | undefined> {
 	const found = await party(inn)
+
 	return found ? toForwarderDetails(found) : undefined
 }

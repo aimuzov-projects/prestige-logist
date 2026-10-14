@@ -27,16 +27,21 @@ const EMPTY: Node = {}
 /** Спуск по дереву. Чего нет — то пустой узел: разбирать приходится и неполные поручения. */
 function at(node: NodeValue, ...path: string[]): Node {
 	let current: NodeValue = node
+
 	for (const key of path) {
 		if (!current || typeof current !== 'object') return EMPTY
+
 		current = Array.isArray(current) ? current[0]?.[key] : current[key]
 	}
+
 	if (!current || typeof current !== 'object') return EMPTY
+
 	return Array.isArray(current) ? (current[0] ?? EMPTY) : current
 }
 
 function attr(node: Node, name: string): string | undefined {
 	const value = node[`@${name}`]
+
 	return typeof value === 'string' || typeof value === 'number' ? String(value) : undefined
 }
 
@@ -52,15 +57,19 @@ const present = (node: Node) => Object.keys(node).length > 0
 function parseAddress(address: Node): FiasAddress {
 	const gar = at(address, 'АдрГАР')
 	const fias = present(gar) ? gar : at(address, 'АдрФИАС')
+
 	if (present(fias)) return fromXml(fias)
 
 	const text = attr(at(address, 'АдрИнф'), 'АдрТекст') ?? attr(at(address, 'АдрРФ'), 'Улица')
+
 	return text ? { text } : {}
 }
 
 function parseOrg(info: Node): Organization {
 	const org = at(info, 'ИдСв', 'СвЮЛУч')
+
 	if (!present(org)) throw new Error('В поручении ожидается организация (СвЮЛУч).')
+
 	return {
 		name: attr(org, 'НаимОрг'),
 		inn: attr(org, 'ИННЮЛ'),
@@ -71,6 +80,7 @@ function parseOrg(info: Node): Organization {
 
 function parseName(name: Node): PersonName | undefined {
 	if (!present(name)) return undefined
+
 	return {
 		lastName: attr(name, 'Фамилия'),
 		firstName: attr(name, 'Имя'),
@@ -84,13 +94,16 @@ function parseName(name: Node): PersonName | undefined {
  */
 function parseFileId(fileId?: string) {
 	const [, , recipient] = (fileId ?? '').split('_')
+
 	return { senderBox: recipient }
 }
 
 /** Титул экспедитора необязателен, но именно из него берётся подписант заявки. */
 function parseForwarderTitle(xml: string): Signatory | undefined {
 	const signature = at(parser.parse(xml) as Node, 'Файл', 'Документ', 'ПодпИнфЭксп')
+
 	if (!present(signature)) return undefined
+
 	return {
 		authorityKind: attr(signature, 'СпосПодтПолном'),
 		position: attr(signature, 'Должн'),
@@ -102,6 +115,7 @@ export function parseForwardingOrder({ client, forwarder }: OrderTitles): Forwar
 	const file = at(parser.parse(client) as Node, 'Файл')
 	const document = at(file, 'Документ')
 	const knd = attr(document, 'КНД')
+
 	if (knd !== KND_FORWARDING_ORDER) {
 		throw new Error(
 			`Ожидался титул клиента поручения экспедитору (КНД ${KND_FORWARDING_ORDER}), ` +

@@ -40,15 +40,21 @@
 	/** Строка под названием шага: что с ним сейчас, чтобы не открывать каждый. */
 	function status(id: StepId) {
 		const input = wizard.input
+
 		if (id === 'upload') return loaded ? wizard.fileName : 'zip или xml'
+
 		if (!loaded || !input || !wizard.order) return 'После загрузки'
+
 		if (id === 'carrier')
 			return wizard.carrierName || (input.carrier.inn ? `ИНН ${input.carrier.inn}` : 'Не выбран')
+
 		if (id === 'route') {
 			const from = city(input.loadingAddress ?? wizard.order.loadingAddress)
 			const to = city(input.unloadingAddress ?? wizard.order.unloadingAddress)
+
 			return from || to ? `${from || '?'} → ${to || '?'}` : 'Адреса не выбраны'
 		}
+
 		return input.orderNumber?.trim() ? `Заказ № ${input.orderNumber.trim()}` : 'Без номера заказа'
 	}
 
@@ -63,13 +69,18 @@
 	function onScroll() {
 		const root = document.documentElement
 		const atBottom = window.innerHeight + window.scrollY >= root.scrollHeight - 2
+
 		if (atBottom) return wizard.spy(sections[sections.length - 1].id)
+
 		const line = parseFloat(getComputedStyle(root).fontSize) * 7
 		let current: StepId = sections[0].id
+
 		for (const { id } of sections) {
 			const top = document.getElementById(`step-${id}`)?.getBoundingClientRect().top
+
 			if (top !== undefined && top <= line) current = id
 		}
+
 		wizard.spy(current)
 	}
 </script>

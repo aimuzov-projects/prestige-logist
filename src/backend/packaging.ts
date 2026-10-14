@@ -13,8 +13,11 @@ let cache: Promise<PackagingKind[]> | undefined
 
 async function load(): Promise<PackagingKind[]> {
 	const response = await fetch(PICKLIST)
+
 	if (!response.ok) throw new Error(`Справочник тары ответил ${response.status}`)
+
 	const { data = [] } = (await response.json()) as { data?: PackagingKind[] }
+
 	return data.map(({ code, name }) => ({ code, name }))
 }
 
@@ -22,8 +25,10 @@ async function load(): Promise<PackagingKind[]> {
 export function packagingKinds(): Promise<PackagingKind[]> {
 	cache ??= load().catch((error) => {
 		cache = undefined
+
 		throw error
 	})
+
 	return cache
 }
 
@@ -31,6 +36,7 @@ export function packagingKinds(): Promise<PackagingKind[]> {
 export async function searchPackaging(query: string, limit = 20): Promise<PackagingKind[]> {
 	const kinds = await packagingKinds()
 	const needle = query.trim().toLowerCase()
+
 	if (!needle) return kinds.slice(0, limit)
 
 	return kinds

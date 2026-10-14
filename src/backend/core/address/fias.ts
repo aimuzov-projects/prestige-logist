@@ -18,6 +18,7 @@ export function fromXml(node: XmlElement): FiasAddress {
 	for (const { key, element, parts, many } of ADDRESS_LEVELS) {
 		if (!parts) {
 			if (isFilled(node[element])) Object.assign(address, { [key]: String(node[element]) })
+
 			continue
 		}
 
@@ -28,6 +29,7 @@ export function fromXml(node: XmlElement): FiasAddress {
 					.map(([own, fns]) => [own, String(item[`@${fns}`])]),
 			),
 		)
+
 		if (items.length) Object.assign(address, { [key]: many ? items : items[0] })
 	}
 
@@ -38,7 +40,9 @@ export function fromXml(node: XmlElement): FiasAddress {
 export function toNodes(address: FiasAddress = {}): XmlNode[] {
 	return ADDRESS_LEVELS.flatMap(({ key, element, parts }) => {
 		const value = address[key]
+
 		if (!isFilled(value)) return []
+
 		if (!parts) return [textEl(element, value as string)]
 
 		return (Array.isArray(value) ? value : [value as AddressPart])

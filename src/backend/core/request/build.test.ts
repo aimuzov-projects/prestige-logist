@@ -22,7 +22,9 @@ test('разбор поручения', () => {
 
 test('текстовый адрес в форму не попадает, а значит и не считается заполненным', () => {
 	const input = prefill(order)
+
 	assert.equal(input.unloadingAddress, undefined)
+
 	assert.deepEqual(
 		missingFields(input).map(({ path }) => path),
 		['carrier.inn', 'carrier.name', 'carrier.address', 'unloadingAddress', 'orderNumber'],
@@ -38,13 +40,16 @@ test('сборка заявки', () => {
 		packageKind: '8A',
 		issuedAt: new Date(2026, 8, 1, 10, 20, 30),
 	}
+
 	assert.deepEqual(missingFields(input), [])
 
 	const xml = buildCarriageRequest(order, input, { uuid: 'uuid' })
+
 	assert.match(
 		xml,
 		/^<\?xml version="1.0" encoding="windows-1251"\?>\r\n<Файл ИдФайл="ON_ZAKZVGO__2BM-EXP_0_20260901_uuid"/,
 	)
+
 	// Пояс у каждой точки свой: Екатеринбург +05, Москва +03.
 	assert.match(xml, /Опер="Погрузка" ПорНомПункт="1" ДатВрОпер="02.09.2026T09:00:00\+05:00"/)
 	assert.match(xml, /Опер="Выгрузка" ПорНомПункт="2" ДатВрОпер="05.09.2026T09:00:00\+03:00"/)
@@ -58,5 +63,6 @@ test('сборка заявки', () => {
 test('незаполненное уходит в черновик заглушками', () => {
 	const input = prefill(order)
 	const xml = buildCarriageRequest(order, withPlaceholders(input, missingFields(input)))
+
 	assert.match(xml, /НомЗак="\[\[Номер заказа\]\]"/)
 })

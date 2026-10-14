@@ -42,10 +42,13 @@
 
 	async function tryDemo() {
 		const response = await fetch(DEMO)
+
 		if (!response.ok) {
 			wizard.analyzeError = `Пример не загрузился: ${response.status}`
+
 			return
 		}
+
 		take(new File([await response.blob()], DEMO.split('/').pop() ?? ''))
 	}
 </script>

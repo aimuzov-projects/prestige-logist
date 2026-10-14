@@ -28,6 +28,7 @@
 	 * наименование или сменили тип: иначе блок прыгал бы обратно в раскрывашку.
 	 */
 	let boxed = $state(false)
+
 	$effect(() => {
 		if (wizard.carrierName) boxed = true
 		else if (!editing) boxed = false

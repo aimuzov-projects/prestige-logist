@@ -40,6 +40,7 @@
 	$effect(() => {
 		const query = packagingQuery.trim()
 		const controller = new AbortController()
+
 		later(250, controller.signal, async () => {
 			try {
 				;({ kinds } = await api<{ kinds: PackagingKind[] }>(
@@ -50,6 +51,7 @@
 				// Справочник Контура недоступен — список просто останется прежним.
 			}
 		})
+
 		return () => controller.abort()
 	})
 
@@ -59,6 +61,7 @@
 	/** Подписанта в разобранном поручении может не быть вовсе, поэтому собираем его по частям. */
 	function patchName(part: PersonName) {
 		const input = wizard.input
+
 		if (input) input.signatory = { ...input.signatory, name: { ...input.signatory?.name, ...part } }
 	}
 </script>

@@ -114,6 +114,7 @@ const abbr = (type?: string) => `${type?.replace(/\.$/, '')}.`
 
 export function addressToText(address: FiasAddress = {}): string {
 	if (address.text) return address.text
+
 	const parts = [
 		address.postalCode,
 		address.municipalDistrict?.name,
@@ -122,5 +123,6 @@ export function addressToText(address: FiasAddress = {}): string {
 		...(address.buildings ?? []).map((b) => `${abbr(b.type)} ${b.number}`),
 		...(address.premises ?? []).map((p) => `${abbr(p.type)} ${p.number}`),
 	]
+
 	return parts.filter(Boolean).join(', ')
 }

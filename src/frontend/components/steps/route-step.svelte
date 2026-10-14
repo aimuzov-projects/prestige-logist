@@ -10,12 +10,15 @@
 	/** В форме дата живёт как ДД.ММ.ГГГГ, а input[type=date] хочет ISO. */
 	const toIso = (date?: string) => {
 		if (!date) return ''
+
 		const [day, month, year] = date.split('.')
+
 		return year ? `${year}-${month}-${day}` : date
 	}
 
 	const fromIso = (value: string) => {
 		const [year, month, day] = value.split('-')
+
 		return day ? `${day}.${month}.${year}` : value
 	}
 

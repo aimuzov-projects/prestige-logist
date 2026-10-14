@@ -19,6 +19,7 @@ export type RequiredField = {
 
 const hasFias = (input: RequestInput, key: 'loadingAddress' | 'unloadingAddress') => {
 	const address = input[key]
+
 	return Boolean(address && !isTextOnly(address) && Object.keys(address).length)
 }
 
