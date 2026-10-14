@@ -147,6 +147,11 @@ input {
 		border-color 0.15s,
 		box-shadow 0.15s;
 
+	/* Safari на iPhone приближает страницу к полю с текстом мельче 16px, стоит в нём встать. */
+	@media (--touch) {
+		font-size: 1rem;
+	}
+
 	/* Выше --missing: та же специфичность, и подсказку незаполненного поля перекрашивает он. */
 	&::placeholder {
 		color: var(--muted);
