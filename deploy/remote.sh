@@ -8,8 +8,9 @@ set -euo pipefail
 {
 	cd /srv/prestige-logist
 
-	# Два пуша подряд не должны собирать compose одновременно: второй ждёт первого.
-	exec 9>/tmp/prestige-logist-deploy.lock
+	# One deploy at a time for all the sites: parallel builds choke the small server,
+	# so a deploy of any site waits here for the previous one.
+	exec 9>/tmp/sites-deploy.lock
 	flock 9
 
 	git pull --ff-only --quiet
