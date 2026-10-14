@@ -33,10 +33,13 @@ type PartMap = Partial<Record<keyof AddressPart, string>>
 
 export type AddressLevel = {
 	key: keyof FiasAddress
+	/** Имя элемента в XML ФНС. */
 	element: string
 	label: string
+	/** Без `parts` уровень — текстовый узел, как `Регион`. */
 	parts?: PartMap
 	partLabels?: Partial<Record<keyof AddressPart, string>>
+	/** Элемент повторяется: в модели это массив, в XML — несколько узлов подряд. */
 	many?: boolean
 }
 
@@ -112,6 +115,12 @@ export const isTextOnly = (address?: FiasAddress) => Boolean(address?.text)
 /** «д» и «д.» приходят вперемешку: из поручения с точкой, из справочника без. */
 const abbr = (type?: string) => `${type?.replace(/\.$/, '')}.`
 
+/**
+ * Адрес одной строкой для показа оператору.
+ *
+ * Регион, поселение и элемент планировочной структуры в строку не попадают,
+ * текстовый адрес из 1С возвращается как есть.
+ */
 export function addressToText(address: FiasAddress = {}): string {
 	if (address.text) return address.text
 

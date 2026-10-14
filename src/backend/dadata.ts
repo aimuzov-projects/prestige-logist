@@ -83,6 +83,12 @@ async function ask<T>(url: string, token: string, body: object) {
 	return (await response.json()) as { suggestions?: Array<{ value: string; data: T }> }
 }
 
+/**
+ * Подсказки dadata по строке адреса, уже разложенные в формат полей формы.
+ *
+ * В отличие от {@link findParty}, без токена бросает ошибку: оператор должен
+ * увидеть, почему поиск адреса не работает.
+ */
 export async function searchAddresses(
 	query: string,
 	{ token, count = 7 }: { token?: string; count?: number },

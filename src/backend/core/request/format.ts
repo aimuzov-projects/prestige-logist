@@ -94,10 +94,12 @@ export function toCompactDate(date: string): string {
 
 const twoDigits = (value: number) => String(value).padStart(2, '0')
 
+/** ДатИнфГО как ДД.ММ.ГГГГ. Дата берётся по поясу процесса, а не точки маршрута. */
 export function fnsDate(moment: Date): string {
 	return `${twoDigits(moment.getDate())}.${twoDigits(moment.getMonth() + 1)}.${moment.getFullYear()}`
 }
 
+/** ВрИнфГО как ЧЧ:ММ:СС, тоже по поясу процесса. */
 export function fnsTime(moment: Date): string {
 	return [moment.getHours(), moment.getMinutes(), moment.getSeconds()].map(twoDigits).join(':')
 }

@@ -111,6 +111,13 @@ function parseForwarderTitle(xml: string): Signatory | undefined {
 	}
 }
 
+/**
+ * Разбирает титулы поручения экспедитору в нашу модель.
+ *
+ * Бросает ошибку, если титул клиента не поручение (КНД не {@link KND_FORWARDING_ORDER})
+ * или в нём нет клиента, экспедитора или грузоотправителя. Остальные поля
+ * необязательны, неполное поручение разбирается как есть.
+ */
 export function parseForwardingOrder({ client, forwarder }: OrderTitles): ForwardingOrder {
 	const file = at(parser.parse(client) as Node, 'Файл')
 	const document = at(file, 'Документ')

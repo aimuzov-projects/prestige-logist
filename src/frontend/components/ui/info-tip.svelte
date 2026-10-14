@@ -5,6 +5,7 @@
 
 	const id = $props.id()
 
+	// Сколько пикселей оставляем между подсказкой и краем экрана.
 	const EDGE = 8
 	let bubble: HTMLElement
 	let shift = $state(0)

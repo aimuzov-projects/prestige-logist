@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte'
 
+	/** `columns` действует с `--sm`, на узком экране сетка всегда в одну колонку. */
 	let { columns = 2, children }: { columns?: 2 | 3; children: Snippet } = $props()
 </script>
 

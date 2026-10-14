@@ -23,6 +23,10 @@ export const CLIENT_TITLE = `<?xml version="1.0" encoding="windows-1251"?>
   </Документ>
 </Файл>`
 
+/**
+ * Синтетический титул экспедитора: в нём только подписант,
+ * остальное parseForwarderTitle не читает.
+ */
 export const FORWARDER_TITLE = `<?xml version="1.0" encoding="utf-8"?>
 <Файл>
   <Документ>

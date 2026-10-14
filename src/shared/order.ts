@@ -22,6 +22,7 @@ export type Signatory = {
 }
 
 export type ForwardingOrder = {
+	/** Ящик ЭДО получателя поручения, то есть наш: в заявке он становится отправителем. */
 	senderBox?: string
 	number?: string
 	date?: string
