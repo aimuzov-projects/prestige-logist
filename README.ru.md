@@ -124,9 +124,9 @@ npm run format:check && npm run lint:js && npm run lint:css && npm run check && 
 
 ## Выкладка
 
-Сервер projects из [infra-server](https://github.com/aimuzov-projects/infra-server): пуш в `main` запускает `deploy.yml`, тот прогоняет проверки и заходит по SSH. Там ключ запускает общий [`deploy/site.sh`](https://github.com/aimuzov-projects/infra-server/blob/main/deploy/site.sh) из infra-server, который подтягивает `main` и пересобирает два контейнера из [`deploy/docker-compose.yml`](deploy/docker-compose.yml): `prestige-logist` (nginx со статикой) и `prestige-logist-api`. Домен, TLS и маршрут `/api` держит общий Caddy. `.env` с токеном dadata лежит на сервере в `/srv/prestige-logist`.
+Сервер projects из [infra-server](https://github.com/aimuzov-projects/infra-server): мерж релизного PR, который ведёт release-please, запускает `deploy.yml`, тот прогоняет проверки и заходит по SSH. Там ключ запускает общий [`deploy/site.sh`](https://github.com/aimuzov-projects/infra-server/blob/main/deploy/site.sh) из infra-server, который подтягивает `main` и пересобирает два контейнера из [`deploy/docker-compose.yml`](deploy/docker-compose.yml): `prestige-logist` (nginx со статикой) и `prestige-logist-api`. Домен, TLS и маршрут `/api` держит общий Caddy. `.env` с токеном dadata лежит на сервере в `/srv/prestige-logist`.
 
-Откатить выкладку: сделать `git revert` плохого коммита в `main` и запушить.
+Быстро откатиться — запустить Deploy вручную с прошлым тегом: `gh workflow run deploy.yml -f tag=v1.2.3`. Исправление плохого коммита выезжает через релизный PR, как любое изменение.
 
 ## Лицензия
 

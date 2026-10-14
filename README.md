@@ -104,9 +104,9 @@ The build puts a CSP with hashes of Astro's scripts and styles into every page (
 
 ## Deployment
 
-The projects server from [infra-server](https://github.com/aimuzov-projects/infra-server): a push to `main` runs `deploy.yml`, which runs the checks and logs in over SSH. There the key runs the shared [`deploy/site.sh`](https://github.com/aimuzov-projects/infra-server/blob/main/deploy/site.sh) of infra-server, which pulls `main` and rebuilds two containers from [`deploy/docker-compose.yml`](deploy/docker-compose.yml): `prestige-logist` (nginx with the static site) and `prestige-logist-api`. The domain, TLS and the `/api` route are handled by the shared Caddy. `.env` with the dadata token lives on the server in `/srv/prestige-logist`.
+The projects server from [infra-server](https://github.com/aimuzov-projects/infra-server): merging the release PR that release-please keeps open runs `deploy.yml`, which runs the checks and logs in over SSH. There the key runs the shared [`deploy/site.sh`](https://github.com/aimuzov-projects/infra-server/blob/main/deploy/site.sh) of infra-server, which pulls `main` and rebuilds two containers from [`deploy/docker-compose.yml`](deploy/docker-compose.yml): `prestige-logist` (nginx with the static site) and `prestige-logist-api`. The domain, TLS and the `/api` route are handled by the shared Caddy. `.env` with the dadata token lives on the server in `/srv/prestige-logist`.
 
-To roll back, `git revert` the bad commit on `main` and push.
+To roll back fast, run Deploy by hand with the previous tag: `gh workflow run deploy.yml -f tag=v1.2.3`. A fix of the bad commit goes out through the release PR like any change.
 
 ## License
 
