@@ -55,7 +55,9 @@ class Wizard {
 	/** Сколько незаполненного осталось на каждом шаге — показываем прямо на вкладках. */
 	missingByStep = $derived.by(() => {
 		const counts: Partial<Record<StepId, number>> = {}
+
 		for (const field of this.missing) counts[field.step] = (counts[field.step] ?? 0) + 1
+
 		return counts
 	})
 
@@ -79,17 +81,23 @@ class Wizard {
 	 */
 	tryDownload = () => {
 		const missing = this.missing
+
 		if (missing.length) {
 			const names = missing.slice(0, 3).map((field) => field.label)
 			const rest = missing.length - names.length
+
 			this.notify(`Заполните: ${names.join(', ')}${rest > 0 ? ` и ещё ${rest}` : ''}`)
 			this.goTo(missing[0].step)
+
 			return
 		}
+
 		if (!this.canDownload) {
 			this.notify('Собираем заявку, нажмите через секунду')
+
 			return
 		}
+
 		this.download()
 	}
 
@@ -99,8 +107,10 @@ class Wizard {
 	 */
 	download = () => {
 		if (!this.canDownload) return
+
 		const bytes = Uint8Array.from(atob(this.request.file), (char) => char.charCodeAt(0))
 		const url = URL.createObjectURL(new Blob([bytes], { type: 'application/xml' }))
+
 		Object.assign(document.createElement('a'), { href: url, download: this.downloadName }).click()
 		URL.revokeObjectURL(url)
 	}
@@ -109,9 +119,11 @@ class Wizard {
 	/** Как перевозчика называть людям: наименование юрлица или ФИО предпринимателя. */
 	carrierName = $derived.by(() => {
 		const carrier = this.input?.carrier
+
 		if (carrier?.kind === 'ИП') {
 			return [carrier.lastName, carrier.firstName, carrier.middleName].filter(Boolean).join(' ')
 		}
+
 		return carrier?.name?.trim() ?? ''
 	})
 	/** Реквизиты, найденные по ИНН; null — не искали или в реестре нет. */
@@ -125,11 +137,13 @@ class Wizard {
 	async analyze(file: File) {
 		this.analyzing = true
 		this.analyzeError = ''
+
 		try {
 			const result = await api<AnalyzeResponse>('/api/analyze', {
 				method: 'POST',
 				body: await file.arrayBuffer(),
 			})
+
 			this.order = result.order
 			this.summary = result.summary
 			this.input = result.input
@@ -152,9 +166,11 @@ class Wizard {
 	/** Форма одна длинная: шаг — это раздел, к которому прокручиваем. */
 	goTo(id: StepId) {
 		if (id !== 'upload' && !this.order) return
+
 		this.step = id
 		this.#scrollingTo = id
 		const still = matchMedia('(prefers-reduced-motion: reduce)').matches
+
 		document.getElementById(`step-${id}`)?.scrollIntoView({ behavior: still ? 'auto' : 'smooth', block: 'start' })
 		// scrollend есть не везде, поэтому слежение возвращаем и по таймеру.
 		clearTimeout(this.#settle)
@@ -192,10 +208,13 @@ class Wizard {
 			if (!this.order || !this.input) {
 				this.request = EMPTY
 				this.building = false
+
 				return
 			}
+
 			const body = JSON.stringify({ order: this.order, input: this.input })
 			const controller = new AbortController()
+
 			this.building = true
 
 			// Пауза гасит поток промежуточных сборок, пока оператор печатает.
@@ -207,6 +226,7 @@ class Wizard {
 						body,
 						signal: controller.signal,
 					})
+
 					this.buildError = ''
 				} catch (error) {
 					if (!controller.signal.aborted) this.buildError = (error as Error).message
@@ -214,6 +234,7 @@ class Wizard {
 					if (!controller.signal.aborted) this.building = false
 				}
 			})
+
 			return () => controller.abort()
 		})
 
@@ -221,23 +242,30 @@ class Wizard {
 		// оно не затирает, а сам ИНН остаётся тем, что набрали.
 		$effect(() => {
 			const inn = this.carrierInn
+
 			// Стёрли или сменили ИНН — карточку чистим сразу, не дожидаясь справочника:
 			// реквизиты прежнего перевозчика не должны молча уехать в заявку под чужим ИНН.
 			if (this.#appliedInn && this.#appliedInn !== inn && this.input) {
 				this.#appliedInn = undefined
 				this.input.carrier = { kind: 'ЮЛ', inn }
 			}
+
 			this.carrierFound = null
+
 			if (!looksLikeInn(inn)) return
 
 			const controller = new AbortController()
+
 			this.carrierSearching = true
+
 			later(400, controller.signal, async () => {
 				try {
 					const { carrier } = await api<{ carrier: Carrier | null }>(`/api/carrier?inn=${inn}`, {
 						signal: controller.signal,
 					})
+
 					this.carrierFound = carrier
+
 					// Повторно найденное не подставляем, иначе правка руками откатывалась бы к реестровой.
 					if (carrier && inn !== this.#appliedInn && this.input) {
 						this.#appliedInn = inn
@@ -249,6 +277,7 @@ class Wizard {
 					if (!controller.signal.aborted) this.carrierSearching = false
 				}
 			})
+
 			return () => controller.abort()
 		})
 	}

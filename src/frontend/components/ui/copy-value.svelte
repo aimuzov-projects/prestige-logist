@@ -15,6 +15,7 @@
 			// Буфер закрыт (не https или запрет браузера) — галочку не показываем, номер виден и так.
 			return
 		}
+
 		copied = true
 		clearTimeout(timer)
 		timer = setTimeout(() => (copied = false), 1500)

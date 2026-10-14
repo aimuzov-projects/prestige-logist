@@ -37,11 +37,13 @@ function personName(name?: PersonName): XmlNode[] {
 		Имя: name?.firstName,
 		Отчество: name?.middleName,
 	})
+
 	return Object.keys(node.attrs).length ? [node] : []
 }
 
 function forwarderNode(order: ForwardingOrder, input: RequestInput) {
 	const { inn, kpp } = order.forwarder
+
 	return el('СвГО', {}, [
 		el('ИдСв', {}, [el('СвЮЛУч', { НаимОрг: input.forwarder.fullName, ИННЮЛ: inn, КПП: kpp })]),
 		addressNode(input.forwarder.address, { countryCode: RUSSIA_COUNTRY_CODE }),
@@ -211,5 +213,6 @@ export function buildCarriageRequest(
 /** Диадок пишет составителя строкой «Наименование, ИНН …, КПП …». */
 function composerName(order: ForwardingOrder, input: RequestInput): string {
 	const { inn, kpp } = order.forwarder
+
 	return `${input.forwarder.fullName}, ИНН ${inn}, КПП ${kpp}`
 }

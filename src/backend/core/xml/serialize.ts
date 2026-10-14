@@ -24,9 +24,11 @@ export function el(
 	children: Array<XmlNode | false | undefined | null> = [],
 ): XmlNode {
 	const clean: Record<string, string> = {}
+
 	for (const [key, value] of Object.entries(attrs)) {
 		if (value !== undefined && value !== null && value !== '') clean[key] = String(value)
 	}
+
 	return { name, attrs: clean, children: children.filter(Boolean) as XmlNode[] }
 }
 
@@ -49,9 +51,11 @@ function renderNode(node: XmlNode, depth: number, indent: string): string {
 	if (node.text !== undefined) {
 		return `${pad}<${node.name}${attrs}>${escapeText(node.text)}</${node.name}>`
 	}
+
 	if (!node.children?.length) return `${pad}<${node.name}${attrs} />`
 
 	const inner = node.children.map((child) => renderNode(child, depth + 1, indent)).join('\n')
+
 	return `${pad}<${node.name}${attrs}>\n${inner}\n${pad}</${node.name}>`
 }
 
@@ -66,6 +70,7 @@ export function serialize(
 	{ encoding = REQUEST_ENCODING, indent = '  ', eol = '\r\n' }: SerializeOptions = {},
 ): string {
 	const body = renderNode(root, 0, indent).split('\n').join(eol)
+
 	// Диадок закрывает файл сразу после корня, без перевода строки.
 	// Держим тот же вид байт в байт.
 	return `<?xml version="1.0" encoding="${encoding}"?>${eol}${body}`

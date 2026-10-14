@@ -22,8 +22,11 @@ export const loadingType = (bodyType?: string) => (bodyType ? LOADING_TYPES[body
  */
 export function normalizePhone(phone?: string): string | undefined {
 	if (!phone) return undefined
+
 	const digits = String(phone).replace(/\D/g, '')
+
 	if (digits.length === 11 && digits.startsWith('7')) return `8${digits.slice(1)}`
+
 	return digits || undefined
 }
 
@@ -40,8 +43,11 @@ export function normalizeTime(time?: string): string | undefined {
 	const parts = String(time ?? '')
 		.trim()
 		.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?$/)
+
 	if (!parts) return time
+
 	const [, hours, minutes, seconds = '00'] = parts
+
 	return `${hours.padStart(2, '0')}:${minutes}:${seconds}`
 }
 
@@ -50,6 +56,7 @@ export function normalizeDate(date?: string): string | undefined {
 	const iso = String(date ?? '')
 		.trim()
 		.match(/^(\d{4})-(\d{2})-(\d{2})$/)
+
 	return iso ? `${iso[3]}.${iso[2]}.${iso[1]}` : date
 }
 
@@ -81,6 +88,7 @@ export function requestFileId({
 /** «31.08.2026» в «20260831» для ИдФайл. */
 export function toCompactDate(date: string): string {
 	const [day, month, year] = date.split('.')
+
 	return `${year}${month}${day}`
 }
 

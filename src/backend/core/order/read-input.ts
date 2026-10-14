@@ -22,15 +22,18 @@ function extractFromZip(buffer: Buffer): OrderTitles {
 	const findXml = (prefix: string) =>
 		entries.find((entry) => {
 			const name = entry.entryName.split('/').pop() ?? ''
+
 			return name.startsWith(prefix) && name.toLowerCase().endsWith('.xml')
 		})
 
 	const client = findXml('ON_POREXPKLT')
+
 	if (!client) {
 		throw new Error('В архиве нет титула клиента ON_POREXPKLT_*.xml — это не комплект поручения экспедитору.')
 	}
 
 	const forwarder = findXml('ON_POREXPEXP')
+
 	return {
 		client: decodeXml(client.getData()),
 		forwarder: forwarder ? decodeXml(forwarder.getData()) : undefined,
@@ -40,5 +43,6 @@ function extractFromZip(buffer: Buffer): OrderTitles {
 /** Принимает и zip комплекта, и одиночный XML титула клиента. */
 export function readInput(buffer: Buffer): OrderTitles {
 	if (startsWith(buffer, ZIP_SIGNATURE)) return extractFromZip(buffer)
+
 	return { client: decodeXml(buffer) }
 }

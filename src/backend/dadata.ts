@@ -26,11 +26,13 @@ const withDot = (type?: string | null) => (!type || type.includes('-') ? (type ?
  */
 function municipality({ area, city }: DadataAddress) {
 	if (area) return { kindCode: city ? '4' : '1', name: area }
+
 	return city ? { kindCode: '2', name: city } : undefined
 }
 
 function locality({ area, city, city_type, settlement, settlement_type }: DadataAddress) {
 	if (settlement) return { kind: withDot(settlement_type), name: settlement }
+
 	return area && city ? { kind: withDot(city_type), name: city } : undefined
 }
 
@@ -75,7 +77,9 @@ async function ask<T>(url: string, token: string, body: object) {
 		},
 		body: JSON.stringify(body),
 	})
+
 	if (!response.ok) throw new Error(`dadata ответила ${response.status}`)
+
 	return (await response.json()) as { suggestions?: Array<{ value: string; data: T }> }
 }
 
@@ -84,9 +88,11 @@ export async function searchAddresses(
 	{ token, count = 7 }: { token?: string; count?: number },
 ): Promise<AddressSuggestion[]> {
 	if (!token) throw new Error('Не задан DADATA_TOKEN — поиск адреса по ФИАС недоступен.')
+
 	if (!query?.trim()) return []
 
 	const { suggestions = [] } = await ask<DadataAddress>(SUGGEST_ADDRESS, token, { query, count })
+
 	return suggestions.map(({ value, data }) => ({ label: value, address: toAddress(data) }))
 }
 
@@ -131,7 +137,9 @@ export async function findParty(inn: string, { token }: { token?: string }) {
 
 	for (const type of ['LEGAL', 'INDIVIDUAL'] as const) {
 		const { suggestions = [] } = await ask<DadataParty>(FIND_PARTY, token, { query: inn.trim(), type })
+
 		if (suggestions[0]) return suggestions[0].data
 	}
+
 	return undefined
 }

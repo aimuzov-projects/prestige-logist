@@ -9,8 +9,11 @@ const options = (list: Element | null | undefined) => [...(list?.querySelectorAl
 /** На поле: стрелка вниз уводит к первому варианту списка. */
 export function enterList(event: KeyboardEvent, list: Element | null | undefined) {
 	if (event.key !== 'ArrowDown') return
+
 	const first = options(list)[0]
+
 	if (!first) return
+
 	event.preventDefault()
 	first.focus()
 }
@@ -28,7 +31,9 @@ export function moveInList(event: KeyboardEvent, input: HTMLElement | null | und
 				: event.key === 'Escape'
 					? input
 					: undefined
+
 	if (!target) return
+
 	event.preventDefault()
 	target.focus()
 }

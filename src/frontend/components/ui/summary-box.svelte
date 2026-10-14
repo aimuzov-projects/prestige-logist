@@ -26,6 +26,7 @@
 	 */
 	function onHeadClick(event: MouseEvent) {
 		if ((event.target as Element).closest('button, a, input')) return
+
 		open = !open
 	}
 </script>

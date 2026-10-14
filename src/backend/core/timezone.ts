@@ -60,13 +60,16 @@ const placeNames = (address?: FiasAddress) =>
 /** Пояс адреса: сперва район-исключение, потом регион, потом московское время. */
 export function offsetByAddress(address?: FiasAddress): string {
 	const exceptions = BY_DISTRICT[Number(address?.region)]
+
 	if (exceptions) {
 		const places = placeNames(address)
+
 		for (const [offset, districts] of Object.entries(exceptions)) {
 			if (districts.some((district) => places.some((place) => place.includes(district)))) {
 				return offset
 			}
 		}
 	}
+
 	return offsetByRegion(address?.region) ?? DEFAULT_OFFSET
 }

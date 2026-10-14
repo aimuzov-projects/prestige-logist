@@ -31,11 +31,15 @@ class TooLarge extends Error {}
 async function readBody(request: IncomingMessage): Promise<Buffer> {
 	const chunks: Buffer[] = []
 	let size = 0
+
 	for await (const chunk of request) {
 		size += chunk.length
+
 		if (size > LIMIT) throw new TooLarge()
+
 		chunks.push(chunk)
 	}
+
 	return Buffer.concat(chunks)
 }
 
@@ -50,6 +54,7 @@ const analyze: Handler = async (_, request) => {
 	const order = parseForwardingOrder(readInput(await readBody(request)))
 	const forwarderDetails = await forwarderByInn(order.forwarder.inn)
 	const input = prefill(order, { forwarderDetails })
+
 	return [200, { order, summary: summarize(order), input, missing: missingFields(input) } satisfies AnalyzeResponse]
 }
 
@@ -66,6 +71,7 @@ const build: Handler = async (_, request) => {
 	// Отметка о формировании — момент сборки, поэтому ставим её здесь, а не в форме.
 	const draft = { ...withPlaceholders(input, missing), issuedAt: new Date() }
 	const xml = buildCarriageRequest(order, draft)
+
 	// Отдаём только байты в windows-1251: Логистика не смотрит на декларацию кодировки.
 	return [200, { file: encodeXml(xml).toString('base64'), missing } satisfies BuildResponse]
 }
@@ -104,6 +110,7 @@ async function handle(request: IncomingMessage, response: ServerResponse) {
 
 	let status: number
 	let body: unknown
+
 	try {
 		;[status, body] = route ? await route(url, request) : [404, { error: 'Нет такой ручки' }]
 	} catch (error) {
