@@ -105,6 +105,11 @@
 			padding: 0 0.5rem;
 			font-size: 0.8125rem;
 			font-variant-numeric: tabular-nums;
+
+			/* Мельче 16px Safari на iPhone приближает поле — см. .input. */
+			@media (--touch) {
+				font-size: 1rem;
+			}
 		}
 	}
 </style>
