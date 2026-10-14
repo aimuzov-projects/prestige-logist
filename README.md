@@ -90,6 +90,8 @@ npm run format:check && npm run lint:js && npm run lint:css && npm run check && 
 
 The core tests (`node --test`) build a request from the synthetic order in [`src/backend/core/fixtures`](src/backend/core/fixtures) and check the encoding, time zones and placeholders.
 
+The e2e tests in [`e2e`](e2e) build the site and open it in Chromium with the shared checks of [infra-site-kit](https://github.com/aimuzov-projects/infra-site-kit): the sitemap pages answer without console errors and pass axe, the theme button switches the scheme and peeks at the other one. The browser is installed once with `npx playwright install chromium`, then `npm run test:e2e`.
+
 ## Content Security Policy
 
 The build puts a CSP with hashes of Astro's scripts and styles into every page (the `security.csp` option in `astro.config.mjs`), with no third-party sources at all. `npm run dev` has no policy, so violations only show up after `npm run build && npm run preview` and in production.
