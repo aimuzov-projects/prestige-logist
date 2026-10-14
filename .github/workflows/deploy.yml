@@ -18,7 +18,7 @@ jobs:
     uses: ./.github/workflows/check.yml
 
   # Пока сервер не подготовлен (ключ, клон в /srv, сайт в Caddy), выкладка пропускается.
-  # Включается переменной репозитория DEPLOY_ENABLED=true. В самом infra-template-site её нет.
+  # Включается переменной репозитория DEPLOY_ENABLED=true. В самом infra-site-template её нет.
   deploy:
     needs: check
     if: vars.DEPLOY_ENABLED == 'true'
@@ -28,7 +28,7 @@ jobs:
       name: production
       url: https://logist.aimuzov.online
     steps:
-      - uses: aimuzov-projects/site-kit/deploy@v1
+      - uses: aimuzov-projects/infra-site-kit/deploy@v1
         with:
           ssh-key: ${{ secrets.DEPLOY_SSH_KEY }}
           url: https://logist.aimuzov.online
