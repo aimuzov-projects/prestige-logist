@@ -72,6 +72,7 @@
 
 		if (atBottom) return wizard.spy(sections[sections.length - 1].id)
 
+		// 7rem от верха окна — чуть ниже шапки (`--header` + `--space` = 5.25rem).
 		const line = parseFloat(getComputedStyle(root).fontSize) * 7
 		let current: StepId = sections[0].id
 
@@ -235,8 +236,7 @@
 			}
 		}
 
-		/* На широком экране угол над шагами, на узком — просто первая кнопка в строке. */
-		/* Угол над шагами: логотип слева, тема и справка справа. На узком — подряд, впритык. */
+		/* Угол над шагами: логотип и справка слева, тема справа. На узком — подряд, впритык. */
 		&__corner {
 			display: flex;
 			gap: 0.25rem;
@@ -445,7 +445,7 @@
 			color: var(--warning);
 			background: var(--warning-bg);
 
-			/* В столбце то же число уже есть в строке статуса. */
+			/* В столбце под шагами есть `MissingList`, число его только дублирует. */
 			@media (--md) {
 				display: none;
 			}
@@ -489,7 +489,6 @@
 			}
 		}
 
-		/* Раздел встаёт под шапку, а не под самый край окна: прокрутка к нему учитывает её высоту. */
 		&__finish {
 			display: flex;
 			flex-wrap: wrap;
@@ -497,6 +496,7 @@
 			align-items: center;
 		}
 
+		/* Раздел встаёт под шапку, а не под самый край окна: прокрутка к нему учитывает её высоту. */
 		&__section {
 			scroll-margin-top: calc(var(--header) + var(--space));
 			display: flex;

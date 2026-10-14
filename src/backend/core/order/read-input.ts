@@ -2,6 +2,7 @@ import AdmZip from 'adm-zip'
 
 import { decodeXml } from '#backend/core/xml/encoding.ts'
 
+// Сигнатура локального заголовка zip (`PK\x03\x04`), по ней отличаем архив от XML.
 const ZIP_SIGNATURE = [0x50, 0x4b, 0x03, 0x04]
 
 const startsWith = (buffer: Buffer, bytes: number[]) => bytes.every((byte, i) => buffer[i] === byte)

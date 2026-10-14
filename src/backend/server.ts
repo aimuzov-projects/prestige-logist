@@ -1,8 +1,10 @@
 /**
- * API конвертера: пять ручек под /api, состояния между запросами нет.
+ * API конвертера: пять ручек под /api плюс health для проверки контейнера,
+ * состояния между запросами нет.
  *
- * Node запускает этот файл сам, без сборки. Ядро в src/core работает только здесь:
- * оно читает zip и пишет windows-1251, браузеру оно отдаёт лишь типы.
+ * Node запускает этот файл сам, без сборки. Ядро в src/backend/core работает
+ * только здесь: оно читает zip и пишет windows-1251. Браузер его не импортирует,
+ * общие типы лежат в src/shared.
  */
 
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http'
@@ -20,6 +22,7 @@ import type { AnalyzeResponse, BuildResponse } from '#shared/api.ts'
 import type { ForwardingOrder } from '#shared/order.ts'
 import type { RequestInput } from '#shared/request.ts'
 
+// NOTE: Порт 8787 прописан ещё в прокси `astro.config.mjs` и в deploy/, менять вместе.
 const PORT = Number(process.env.PORT ?? 8787)
 const LIMIT = 20 * 1024 * 1024
 

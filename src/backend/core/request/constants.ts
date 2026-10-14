@@ -31,6 +31,7 @@ export const CARGO_DEFAULTS = {
 	divisible: '1',
 } as const
 
+// Размеры места и параметры ТС не опускаем по той же причине, что и `CARGO_DEFAULTS`.
 export const PACKAGE_SIZE_DEFAULTS = { height: '0', length: '0', width: '0' } as const
 
 export const VEHICLE_DEFAULTS = { type: 'Грузовой', capacity: '0', volume: '0' } as const

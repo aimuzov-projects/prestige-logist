@@ -1,6 +1,7 @@
 <script lang="ts">
 	import TriangleAlert from '@lucide/svelte/icons/triangle-alert'
 
+	/** Пустая строка — тоста нет, но сам live-регион остаётся в DOM. */
 	let { message }: { message: string } = $props()
 </script>
 

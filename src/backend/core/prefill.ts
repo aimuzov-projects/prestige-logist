@@ -4,6 +4,7 @@ import type { Carrier, OrderSummary, RequestInput } from '#shared/request.ts'
 
 const byFias = (address?: FiasAddress) => (isTextOnly(address) ? undefined : address)
 
+/** Свои реквизиты из ЕГРЮЛ (через DaData), см. `toForwarderDetails`. */
 export type ForwarderDetails = {
 	fullName?: string
 	address?: FiasAddress

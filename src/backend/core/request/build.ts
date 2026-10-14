@@ -102,10 +102,18 @@ function cargoNode(order: ForwardingOrder, input: RequestInput) {
 }
 
 export type BuildOptions = {
+	/** Хвост ИдФайл. Тесты передают свой, чтобы имя файла не менялось от запуска к запуску. */
 	uuid?: string
+	/** Попадает только в XML-декларацию, в байты строку переводит `encodeXml`. */
 	encoding?: string
 }
 
+/**
+ * Собирает заказ-заявку (КНД 1110361) из поручения и значений формы.
+ *
+ * Возвращает строку, а не байты: декларация уже обещает windows-1251, поэтому
+ * перед отдачей строку нужно прогнать через `encodeXml` с той же кодировкой.
+ */
 export function buildCarriageRequest(
 	order: ForwardingOrder,
 	input: RequestInput,

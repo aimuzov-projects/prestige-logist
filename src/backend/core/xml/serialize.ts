@@ -8,6 +8,7 @@
 
 import { REQUEST_ENCODING } from '#backend/core/xml/encoding.ts'
 
+/** Если задан `text`, дети не выводятся: узел либо текстовый, либо с вложенными. */
 export type XmlNode = {
 	name: string
 	attrs: Record<string, string>
@@ -65,6 +66,12 @@ export type SerializeOptions = {
 	eol?: string
 }
 
+/**
+ * Дерево в строку с XML-декларацией.
+ *
+ * `encoding` пишется только в декларацию. Строку в байты переводит `encodeXml`,
+ * и кодировка там должна быть та же, иначе файл разберут не той кодировкой.
+ */
 export function serialize(
 	root: XmlNode,
 	{ encoding = REQUEST_ENCODING, indent = '  ', eol = '\r\n' }: SerializeOptions = {},

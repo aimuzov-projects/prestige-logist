@@ -38,10 +38,12 @@ const BY_DISTRICT: Record<number, Record<string, string[]>> = {
 	65: { '+12:00': ['северо-курильск'] },
 }
 
+/** Московское время: на случай, если регион не указан или незнаком. */
 export const DEFAULT_OFFSET = '+03:00'
 
 const OFFSETS = new Map(Object.entries(BY_OFFSET).flatMap(([offset, codes]) => codes.map((code) => [code, offset])))
 
+/** Пояс только по коду региона, районы-исключения тут не учитываются. */
 export function offsetByRegion(region?: string): string | undefined {
 	return OFFSETS.get(Number(region))
 }

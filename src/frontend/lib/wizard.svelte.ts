@@ -12,6 +12,10 @@ import { missingFields } from '#shared/fields.ts'
 import type { ForwardingOrder } from '#shared/order.ts'
 import type { Carrier, OrderSummary, RequestInput } from '#shared/request.ts'
 
+/**
+ * Разделы формы по порядку: кнопки "назад" и "дальше" ходят по индексу.
+ * Из `id` собирается якорь раздела `step-${id}`, к нему и едет прокрутка.
+ */
 export const STEPS = [
 	{ id: 'upload', title: 'Поручение' },
 	{ id: 'carrier', title: 'Перевозчик' },
@@ -182,6 +186,7 @@ class Wizard {
 		if (!this.#scrollingTo) this.step = id
 	}
 
+	/** Прокрутка доехала (`scrollend` или таймер из `goTo`): шаг снова следит за экраном. */
 	settle() {
 		clearTimeout(this.#settle)
 		this.#scrollingTo = null

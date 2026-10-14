@@ -47,6 +47,8 @@
 		suggestions = []
 		error = ''
 
+		// NOTE: Порог в три символа повторяется в разметке, по нему решаем,
+		// показывать ли "Ничего не нашлось".
 		if (!searchable || text.length < 3) return
 
 		const controller = new AbortController()
