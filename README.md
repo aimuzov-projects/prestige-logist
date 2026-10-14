@@ -73,7 +73,7 @@ Fixed values (times, cargo state, vehicle parameters) live in [`src/backend/core
 
 ## Running
 
-Stack and layout follow [infra-template-site](https://github.com/aimuzov-projects/infra-template-site): Astro + Svelte 5, Prettier, oxlint, stylelint (BEM), `node --test`. Requires Node 26.11.1, the same version is pinned in `package.json` and both Dockerfiles.
+Stack and layout follow [infra-site-template](https://github.com/aimuzov-projects/infra-site-template): Astro + Svelte 5, Prettier, oxlint, stylelint (BEM), `node --test`. Requires Node 26.11.1, the same version is pinned in `package.json` and both Dockerfiles.
 
 ```sh
 cp .env.example .env   # DADATA_TOKEN is optional: without it addresses and carriers are entered by hand
