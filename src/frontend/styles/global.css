@@ -85,7 +85,9 @@ html {
 	-webkit-font-smoothing: antialiased;
 }
 
-body {
+/* .theme-peek из infra-site-kit: копия страницы под кругом темы, раскладка та же. */
+body,
+.theme-peek {
 	display: flex;
 	flex-direction: column;
 	min-height: 100svh;
