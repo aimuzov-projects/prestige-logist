@@ -8,16 +8,17 @@
 
 	import Button from '#frontend/components/ui/button.svelte'
 
-	type Theme = 'system' | 'light' | 'dark'
+	type Scheme = 'light' | 'dark'
+	type Theme = 'system' | Scheme
 
 	/** Ключ общий со скриптом public/theme.js: тот применяет выбор до отрисовки. */
 	const KEY = 'theme'
-	const NEXT: Record<Theme, Theme> = { system: 'light', light: 'dark', dark: 'system' }
 	const VIEW = {
-		system: { icon: SunMoon, label: 'как в системе', action: 'Включить светлую тему' },
-		light: { icon: Sun, label: 'светлая', action: 'Включить тёмную тему' },
-		dark: { icon: Moon, label: 'тёмная', action: 'Вернуть тему как в системе' },
+		system: { icon: SunMoon, label: 'как в системе' },
+		light: { icon: Sun, label: 'светлая' },
+		dark: { icon: Moon, label: 'тёмная' },
 	}
+	const ACTION: Record<Scheme, string> = { light: 'Включить светлую тему', dark: 'Включить тёмную тему' }
 	/** Отступ подсказки от края экрана. */
 	const EDGE = 8
 
@@ -25,7 +26,14 @@
 	let { skipTab = false }: { skipTab?: boolean } = $props()
 
 	let theme = $state<Theme>('system')
+	let system = $state<Scheme>('light')
 	const view = $derived(VIEW[theme])
+	/**
+	 * Клик всегда переворачивает видимую схему, как и круг themePeek при наведении.
+	 * Иначе из "как в системе" можно попасть в ту же схему, и клик выглядит пустым.
+	 */
+	const next = $derived<Scheme>((theme === 'system' ? system : theme) === 'dark' ? 'light' : 'dark')
+	const action = $derived(theme !== 'system' && next === system ? 'Вернуть тему как в системе' : ACTION[next])
 	const tipId = $props.id()
 
 	let anchor: HTMLElement | undefined
@@ -36,10 +44,19 @@
 		const stored = document.documentElement.dataset.theme
 
 		if (stored === 'light' || stored === 'dark') theme = stored
+
+		const media = matchMedia('(prefers-color-scheme: dark)')
+		const sync = () => (system = media.matches ? 'dark' : 'light')
+
+		sync()
+		media.addEventListener('change', sync)
+
+		return () => media.removeEventListener('change', sync)
 	})
 
 	function cycle() {
-		theme = NEXT[theme]
+		// Попали в системную схему: снова следуем системе, а не фиксируем её.
+		theme = next === system ? 'system' : next
 		const root = document.documentElement
 
 		if (theme === 'system') delete root.dataset.theme
@@ -98,7 +115,7 @@
 >
 	<view.icon size={16} />
 </Button>
-<span bind:this={tip} id={tipId} role="tooltip" popover="manual" class="theme-tip">{view.action}</span>
+<span bind:this={tip} id={tipId} role="tooltip" popover="manual" class="theme-tip">{action}</span>
 
 <svelte:window onscroll={place} onresize={place} />
 
