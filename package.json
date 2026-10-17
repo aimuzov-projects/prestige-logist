@@ -1,7 +1,7 @@
 {
 	"name": "prestige-logist",
 	"type": "module",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"private": true,
 	"description": "Конвертер электронного поручения экспедитору (КНД 1110486) в заказ-заявку на перевозку груза (КНД 1110361)",
 	"license": "MIT",
