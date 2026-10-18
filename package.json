@@ -29,7 +29,7 @@
 		"iconv-lite": "0.6.3"
 	},
 	"devDependencies": {
-		"@aimuzov-projects/infra-site-kit": "github:aimuzov-projects/infra-site-kit#v1.9.0",
+		"@aimuzov-projects/infra-site-kit": "github:aimuzov-projects/infra-site-kit#feature/not-found",
 		"@astrojs/check": "0.9.10",
 		"@astrojs/sitemap": "3.7.4",
 		"@astrojs/svelte": "9.0.1",
