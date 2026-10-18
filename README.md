@@ -97,7 +97,7 @@ The e2e tests in [`e2e`](e2e) build the site and open it in Chromium with the sh
 The build puts a CSP with hashes of Astro's scripts and styles into every page (the `security.csp` option in `astro.config.mjs`), with no third-party sources at all. `npm run dev` has no policy, so violations only show up after `npm run build && npm run preview` and in production.
 
 - No `style=""` attributes or handlers like `onclick`: styles go through classes, handlers live in `<script>`.
-- An inline script that runs before the first paint doesn't pass by hash, so the theme choice lives in a separate file, [`public/theme.js`](public/theme.js).
+- An inline script that runs before the first paint doesn't pass by hash, so the theme choice is applied by a separate file, `ThemeBoot` from infra-site-kit.
 
 ## External sources
 
