@@ -1,5 +1,6 @@
 ---
 import '@fontsource-variable/inter'
+import ThemeBoot from '@aimuzov-projects/infra-site-kit/theme-boot.astro'
 import '#frontend/styles/global.css'
 import SiteFooter from '#frontend/components/site-footer.astro'
 import { site } from '#frontend/data/site.ts'
@@ -35,7 +36,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site)
 		<meta property="og:description" content={description} />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<!-- Блокирующий намеренно: тема должна встать до первой отрисовки. -->
-		<script is:inline src="/theme.js"></script>
+		<ThemeBoot />
 		<slot name="head" />
 	</head>
 	<body>

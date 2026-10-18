@@ -3,18 +3,21 @@
 	import Moon from '@lucide/svelte/icons/moon'
 	import Sun from '@lucide/svelte/icons/sun'
 	import SunMoon from '@lucide/svelte/icons/sun-moon'
+	import {
+		nextTheme,
+		toggleTheme,
+		watchTheme,
+		type Scheme,
+		type Theme,
+	} from '@aimuzov-projects/infra-site-kit/theme.js'
 	import { themePeek } from '@aimuzov-projects/infra-site-kit/theme-peek.js'
 	import { onMount, tick } from 'svelte'
 
 	import Button from '#frontend/components/ui/button.svelte'
 
-	type Scheme = 'light' | 'dark'
-	type Theme = 'system' | Scheme
-
-	/** Ключ общий со скриптом public/theme.js: тот применяет выбор до отрисовки. */
-	const KEY = 'theme'
+	// Выбор до отрисовки ставит ThemeBoot в layouts/base.astro, ключ по умолчанию у обоих.
 	const VIEW = {
-		system: { icon: SunMoon, label: 'как в системе' },
+		auto: { icon: SunMoon, label: 'как в системе' },
 		light: { icon: Sun, label: 'светлая' },
 		dark: { icon: Moon, label: 'тёмная' },
 	}
@@ -25,53 +28,25 @@
 	/** Убрать из Tab: в мастере клавиатурой ходят только по полям формы. */
 	let { skipTab = false }: { skipTab?: boolean } = $props()
 
-	let theme = $state<Theme>('system')
+	let theme = $state<Theme>('auto')
 	let system = $state<Scheme>('light')
 	const view = $derived(VIEW[theme])
-	/**
-	 * Клик всегда переворачивает видимую схему, как и круг themePeek при наведении.
-	 * Иначе из "как в системе" можно попасть в ту же схему, и клик выглядит пустым.
-	 */
-	const next = $derived<Scheme>((theme === 'system' ? system : theme) === 'dark' ? 'light' : 'dark')
-	const action = $derived(theme !== 'system' && next === system ? 'Вернуть тему как в системе' : ACTION[next])
+	const next = $derived(nextTheme(theme, system))
+	const action = $derived(next === 'auto' ? 'Вернуть тему как в системе' : ACTION[next])
 	const tipId = $props.id()
 
 	let anchor: HTMLElement | undefined
 	let tip: HTMLElement
 
-	// На сервере document нет: выбор, уже применённый public/theme.js, читаем в браузере.
-	onMount(() => {
-		const stored = document.documentElement.dataset.theme
-
-		if (stored === 'light' || stored === 'dark') theme = stored
-
-		const media = matchMedia('(prefers-color-scheme: dark)')
-		const sync = () => (system = media.matches ? 'dark' : 'light')
-
-		sync()
-		media.addEventListener('change', sync)
-
-		return () => media.removeEventListener('change', sync)
-	})
-
-	function cycle() {
-		// Попали в системную схему: снова следуем системе, а не фиксируем её.
-		theme = next === system ? 'system' : next
-		const root = document.documentElement
-
-		if (theme === 'system') delete root.dataset.theme
-		else root.dataset.theme = theme
-
-		try {
-			if (theme === 'system') localStorage.removeItem(KEY)
-			else localStorage.setItem(KEY, theme)
-		} catch {
-			// Хранилище закрыто (приватный режим) — тема продержится до перезагрузки.
-		}
-
-		// Текст подсказки сменился вместе с темой, ширина с ним: центруем заново.
-		tick().then(place)
-	}
+	// На сервере document нет: выбор, уже применённый ThemeBoot, читаем в браузере.
+	onMount(() =>
+		watchTheme((current, scheme) => {
+			theme = current
+			system = scheme
+			// Текст подсказки сменился вместе с темой, ширина с ним: центруем заново.
+			tick().then(place)
+		}),
+	)
 
 	/**
 	 * Подсказка живёт в верхнем слое (popover), иначе её накрыл бы круг с другой темой.
@@ -106,7 +81,7 @@
 	aria-label={`Тема: ${view.label}. Переключить`}
 	aria-describedby={tipId}
 	tabindex={skipTab ? -1 : undefined}
-	onclick={cycle}
+	onclick={() => toggleTheme()}
 	onpointerenter={showTip}
 	onpointerleave={hideTip}
 	onfocus={showTip}
