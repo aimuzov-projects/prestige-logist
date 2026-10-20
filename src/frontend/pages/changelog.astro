@@ -1,0 +1,64 @@
+---
+import Changelog from '@aimuzov-projects/infra-site-kit/changelog.astro'
+import * as lucide from 'lucide-static'
+
+import CornerLinks from '#frontend/components/corner-links.svelte'
+import Logo from '#frontend/components/logo.svelte'
+import ThemeToggle from '#frontend/components/theme-toggle.svelte'
+import releases from '#frontend/data/changelog.json'
+import Base from '#frontend/layouts/base.astro'
+---
+
+<Base title="Что нового" description="Что изменилось в Логисте: новые автоподстановки, исправления и удобства формы.">
+	<div class="changelog-page">
+		<header class="changelog-page__header">
+			<div class="container changelog-page__header-inner">
+				<Logo href="/" label="Логист — к заявке" />
+				<div class="changelog-page__header-end">
+					<CornerLinks current="/changelog" client:load />
+					<ThemeToggle client:load />
+				</div>
+			</div>
+		</header>
+
+		<main class="container changelog-page__main">
+			<Changelog
+				{releases}
+				icons={lucide}
+				lead="Как менялся Логист: что теперь подставляется само, что исправлено и что стало удобнее."
+			/>
+		</main>
+	</div>
+</Base>
+
+<style>
+	.changelog-page {
+		display: flex;
+		flex: 1;
+		flex-direction: column;
+
+		&__header {
+			border-bottom: 1px solid var(--border);
+		}
+
+		&__header-inner {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			height: 4.25rem;
+		}
+
+		&__header-end {
+			display: flex;
+			gap: 0.25rem;
+			align-items: center;
+		}
+
+		&__main {
+			--changelog-accent: var(--brand-text);
+			--changelog-muted: var(--muted);
+			--changelog-padding: 2.5rem 0 4rem;
+			--changelog-width: none;
+		}
+	}
+</style>

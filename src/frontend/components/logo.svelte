@@ -1,7 +1,7 @@
 <script lang="ts">
 	type Props = {
-		/** Куда ведёт: из мастера — на страницу о проекте, со страницы о проекте — к заявке. */
-		href: string
+		/** Куда ведёт; без него знак просто стоит, как в мастере, где о сервисе рассказывает значок в углу. */
+		href?: string
 		label: string
 		/** Подпись рядом со знаком: всегда или только на широком экране, где хватает места. */
 		wordmark?: 'always' | 'wide'
@@ -16,7 +16,14 @@
 	Знак — «Л» из маршрута: две остановки внизу, путь через вершину. Тот же рисунок
 	в public/favicon.svg, только с цветом гвоздями: там нет переменных темы.
 -->
-<a {href} class="logo" aria-label={label} tabindex={skipTab ? -1 : undefined}>
+<svelte:element
+	this={href ? 'a' : 'span'}
+	{href}
+	class="logo"
+	role={href ? undefined : 'img'}
+	aria-label={label}
+	tabindex={href && skipTab ? -1 : undefined}
+>
 	<svg class="logo__mark" viewBox="0 0 32 32" aria-hidden="true">
 		<rect width="32" height="32" rx="9" fill="currentColor" />
 		<path
@@ -31,7 +38,7 @@
 		<circle cx="23" cy="22.5" r="2.75" fill="var(--brand-fg)" />
 	</svg>
 	<span class={['logo__word', wordmark === 'wide' && 'logo__word--wide']}>Логист</span>
-</a>
+</svelte:element>
 
 <style>
 	.logo {
