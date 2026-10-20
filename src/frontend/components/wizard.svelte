@@ -1,6 +1,5 @@
 <script lang="ts">
 	import Check from '@lucide/svelte/icons/check'
-	import CircleHelp from '@lucide/svelte/icons/circle-help'
 	import ClipboardList from '@lucide/svelte/icons/clipboard-list'
 	import Download from '@lucide/svelte/icons/download'
 	import FileInput from '@lucide/svelte/icons/file-input'
@@ -8,6 +7,7 @@
 	import RouteIcon from '@lucide/svelte/icons/route'
 	import Truck from '@lucide/svelte/icons/truck'
 
+	import CornerLinks from '#frontend/components/corner-links.svelte'
 	import MissingList from '#frontend/components/missing-list.svelte'
 	import Logo from '#frontend/components/logo.svelte'
 	import StepNav from '#frontend/components/step-nav.svelte'
@@ -97,19 +97,11 @@
 <div class="wizard">
 	<header class={['wizard__header', scrolled && 'wizard__header--stuck']}>
 		<div class="container wizard__header-inner">
-			<!-- Угол над шагами: заголовок шага стоит над формой, а здесь — переключатель темы. -->
+			<!-- Угол над шагами: заголовок шага стоит над формой, а здесь — значки «О сервисе», «Что нового» и тема. -->
 			<div class="wizard__corner">
-				<Logo skipTab href="/about" label="Логист — о проекте" wordmark="wide" />
-				<a
-					href="/about"
-					tabindex="-1"
-					class="wizard__help"
-					aria-label="Как это работает"
-					title="Как это работает"
-				>
-					<CircleHelp size={14} />
-				</a>
+				<Logo label="Логист" wordmark="wide" />
 				<span class="wizard__spacer"></span>
+				<CornerLinks current="/" skipTab />
 				<span class="wizard__theme"><ThemeToggle skipTab /></span>
 			</div>
 			<div class="wizard__heading">
@@ -254,39 +246,6 @@
 
 			@media (--below-sm) {
 				display: none;
-			}
-		}
-
-		/* Маленький «?» вплотную к названию: справка о самом сервисе. Где названия нет, нет и его:
-		   туда ведёт ссылка на первом шаге. */
-		&__help {
-			display: inline-flex;
-			align-items: center;
-			justify-content: center;
-			width: 1.5rem;
-			height: 1.5rem;
-			border-radius: 50%;
-			color: var(--muted);
-			transition:
-				background-color 0.15s,
-				color 0.15s;
-
-			@media (--below-md) {
-				display: none;
-			}
-
-			@media (--reduced-motion) {
-				transition: none;
-			}
-
-			&:hover {
-				color: var(--fg);
-				background: var(--surface);
-			}
-
-			&:focus-visible {
-				outline: none;
-				box-shadow: 0 0 0 3px var(--ring);
 			}
 		}
 

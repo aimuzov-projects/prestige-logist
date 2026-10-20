@@ -1,4 +1,5 @@
 ---
+import CornerLinks from '#frontend/components/corner-links.svelte'
 import Icon, { type IconName } from '#frontend/components/icon.svelte'
 import Logo from '#frontend/components/logo.svelte'
 import ThemeToggle from '#frontend/components/theme-toggle.svelte'
@@ -49,7 +50,10 @@ const AUTO: Array<{ icon: IconName; title: string; text: string }> = [
 		<header class="about__header">
 			<div class="container about__header-inner">
 				<Logo href="/" label="Логист — к заявке" />
-				<ThemeToggle client:load />
+				<div class="about__header-end">
+					<CornerLinks current="/about" client:load />
+					<ThemeToggle client:load />
+				</div>
 			</div>
 		</header>
 
@@ -160,6 +164,12 @@ const AUTO: Array<{ icon: IconName; title: string; text: string }> = [
 			align-items: center;
 			justify-content: space-between;
 			height: 4.25rem;
+		}
+
+		&__header-end {
+			display: flex;
+			gap: 0.25rem;
+			align-items: center;
 		}
 
 		&__main {
