@@ -1,19 +1,21 @@
-import { expect, test } from '@playwright/test'
+import { expect, test, type Page } from '@playwright/test'
+
+// Значок в шапке: те же подписи бывают у ссылок в записях ченжлога и в его оглавлении
+const corner = (page: Page, name: string) => page.getByRole('banner').getByRole('link', { name, exact: true })
 
 test('значки в углу ведут на «О сервисе» и «Что нового», свой горит и никуда не ведёт', async ({ page }) => {
 	await page.goto('/about')
-	await page.getByRole('link', { name: 'Что нового' }).click()
+	await corner(page, 'Что нового').click()
 
 	await expect(page).toHaveURL(/\/changelog\/?$/)
 	await expect(page.getByRole('heading', { level: 1, name: 'Что нового' })).toBeVisible()
 
-	const own = page.getByRole('link', { name: 'Что нового' })
+	const own = corner(page, 'Что нового')
 
 	await expect(own).toHaveAttribute('aria-current', 'page')
 	await expect(own).not.toHaveAttribute('href')
 
-	// Первая ссылка -- значок в шапке: «О сервисе» есть ещё в записи 1.0.0
-	await page.getByRole('link', { name: 'О сервисе' }).first().click()
+	await corner(page, 'О сервисе').click()
 	await expect(page).toHaveURL(/\/about\/?$/)
 })
 
@@ -22,13 +24,13 @@ test('в мастере логотип -- просто знак, о сервис
 
 	await expect(page.getByRole('img', { name: 'Логист' })).toBeVisible()
 	await expect(page.locator('a', { has: page.getByRole('img', { name: 'Логист' }) })).toHaveCount(0)
-	await expect(page.getByRole('link', { name: 'О сервисе' })).toHaveAttribute('href', '/about')
+	await expect(corner(page, 'О сервисе')).toHaveAttribute('href', '/about')
 })
 
 test('подсказка значка показывает подпись и закрывается по Esc', async ({ page }) => {
 	await page.goto('/about')
 
-	const link = page.getByRole('link', { name: 'Что нового' })
+	const link = corner(page, 'Что нового')
 	const tip = link.locator('xpath=following-sibling::*[1]')
 
 	await link.focus()
