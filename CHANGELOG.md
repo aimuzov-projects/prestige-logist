@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.2.0](https://github.com/aimuzov-projects/prestige-logist/compare/v1.1.0...v1.2.0) (2026-10-20)
+
+
+### Features
+
+* add a What's new page and corner links next to the theme ([f7dceab](https://github.com/aimuzov-projects/prestige-logist/commit/f7dceab9253aafb62d5cf94d611a6c69e2e9b966))
+* add a What's new page and corner links next to the theme ([a0aad5c](https://github.com/aimuzov-projects/prestige-logist/commit/a0aad5c1f4bd705244a6f3f0cf8bc8e41be14b52))
+
+
+### Bug Fixes
+
+* **layout:** keep the page width steady when the window scrollbar comes and goes ([085ef0b](https://github.com/aimuzov-projects/prestige-logist/commit/085ef0b349595e2a2b9c87d2075891c08c6189a4))
+* **layout:** keep the page width steady when the window scrollbar comes and goes ([d4c60d6](https://github.com/aimuzov-projects/prestige-logist/commit/d4c60d647a8825817100d8cd82185758f062b473))
+* **layout:** reserve the scrollbar gutter on every page ([ece7381](https://github.com/aimuzov-projects/prestige-logist/commit/ece73810733aff30f3040170dd72bcd5d5cc8524))
+
 ## [1.1.0](https://github.com/aimuzov-projects/prestige-logist/compare/v1.0.0...v1.1.0) (2026-10-18)
 
 
