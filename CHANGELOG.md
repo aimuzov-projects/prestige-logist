@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.0](https://github.com/aimuzov-projects/prestige-logist/compare/v1.2.0...v1.3.0) (2026-10-20)
+
+
+### Features
+
+* reserve the scrollbar gutter on every page ([f516142](https://github.com/aimuzov-projects/prestige-logist/commit/f5161423f7a2c2cf0977f9f3d7703b589f6633ad))
+* reserve the scrollbar gutter on every page ([bfe2912](https://github.com/aimuzov-projects/prestige-logist/commit/bfe2912cc433294ee1714daa74c23744b8a9344e))
+
 ## [1.2.0](https://github.com/aimuzov-projects/prestige-logist/compare/v1.1.0...v1.2.0) (2026-10-20)
 
 
