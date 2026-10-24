@@ -8,12 +8,12 @@
 </p>
 
 <p align="center">
-	<a href="https://github.com/aimuzov-projects/prestige-logist/actions/workflows/deploy.yml"><img src="https://img.shields.io/github/actions/workflow/status/aimuzov-projects/prestige-logist/deploy.yml?branch=main&label=deploy" alt="Deploy"></a>
+	<a href="https://github.com/aimuzov/prestige-logist/actions/workflows/deploy.yml"><img src="https://img.shields.io/github/actions/workflow/status/aimuzov/prestige-logist/deploy.yml?branch=main&label=deploy" alt="Deploy"></a>
 	<a href="https://logist.aimuzov.online"><img src="https://img.shields.io/website?url=https%3A%2F%2Flogist.aimuzov.online&label=site" alt="Site status"></a>
-	<a href="package.json"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Faimuzov-projects%2Fprestige-logist%2Fmain%2Fpackage.json&query=%24.engines.node&label=node&logo=nodedotjs&logoColor=white&color=5fa04e" alt="Node"></a>
-	<a href="https://astro.build"><img src="https://img.shields.io/github/package-json/dependency-version/aimuzov-projects/prestige-logist/dev/astro?logo=astro&logoColor=white&color=bc52ee" alt="Astro"></a>
-	<a href="https://svelte.dev"><img src="https://img.shields.io/github/package-json/dependency-version/aimuzov-projects/prestige-logist/dev/svelte?logo=svelte&logoColor=white&color=ff3e00" alt="Svelte"></a>
-	<a href="LICENSE"><img src="https://img.shields.io/github/license/aimuzov-projects/prestige-logist" alt="License"></a>
+	<a href="package.json"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Faimuzov%2Fprestige-logist%2Fmain%2Fpackage.json&query=%24.engines.node&label=node&logo=nodedotjs&logoColor=white&color=5fa04e" alt="Node"></a>
+	<a href="https://astro.build"><img src="https://img.shields.io/github/package-json/dependency-version/aimuzov/prestige-logist/dev/astro?logo=astro&logoColor=white&color=bc52ee" alt="Astro"></a>
+	<a href="https://svelte.dev"><img src="https://img.shields.io/github/package-json/dependency-version/aimuzov/prestige-logist/dev/svelte?logo=svelte&logoColor=white&color=ff3e00" alt="Svelte"></a>
+	<a href="LICENSE"><img src="https://img.shields.io/github/license/aimuzov/prestige-logist" alt="License"></a>
 </p>
 
 <h3 align="center">A carrier request from a forwarding order</h3>
@@ -73,7 +73,7 @@ Fixed values (times, cargo state, vehicle parameters) live in [`src/backend/core
 
 ## Running
 
-Stack and layout follow [infra-site-template](https://github.com/aimuzov-projects/infra-site-template): Astro + Svelte 5, Prettier, oxlint, stylelint (BEM), `node --test`. Requires Node 26.11.1, the same version is pinned in `package.json` and both Dockerfiles.
+Stack and layout follow [infra-site-template](https://github.com/aimuzov/infra-site-template): Astro + Svelte 5, Prettier, oxlint, stylelint (BEM), `node --test`. Requires Node 26.11.1, the same version is pinned in `package.json` and both Dockerfiles.
 
 ```sh
 cp .env.example .env   # DADATA_TOKEN is optional: without it addresses and carriers are entered by hand
@@ -90,7 +90,7 @@ npm run format:check && npm run lint:js && npm run lint:css && npm run check && 
 
 The core tests (`node --test`) build a request from the synthetic order in [`src/backend/core/fixtures`](src/backend/core/fixtures) and check the encoding, time zones and placeholders.
 
-The e2e tests in [`e2e`](e2e) build the site and open it in Chromium with the shared checks of [infra-site-kit](https://github.com/aimuzov-projects/infra-site-kit): the sitemap pages answer without console errors and pass axe, the theme button switches the scheme and peeks at the other one. The browser is installed once with `npx playwright install chromium`, then `npm run test:e2e`.
+The e2e tests in [`e2e`](e2e) build the site and open it in Chromium with the shared checks of [infra-site-kit](https://github.com/aimuzov/infra-site-kit): the sitemap pages answer without console errors and pass axe, the theme button switches the scheme and peeks at the other one. The browser is installed once with `npx playwright install chromium`, then `npm run test:e2e`.
 
 ## Content Security Policy
 
@@ -106,7 +106,7 @@ The build puts a CSP with hashes of Astro's scripts and styles into every page (
 
 ## Deployment
 
-The projects server from [infra-server](https://github.com/aimuzov-projects/infra-server): merging the release PR that release-please keeps open runs `deploy.yml`, which runs the checks and logs in over SSH. There the key runs the shared [`deploy/site.sh`](https://github.com/aimuzov-projects/infra-server/blob/main/deploy/site.sh) of infra-server, which pulls `main` and rebuilds two containers from [`deploy/docker-compose.yml`](deploy/docker-compose.yml): `prestige-logist` (nginx with the static site) and `prestige-logist-api`. The domain, TLS and the `/api` route are handled by the shared Caddy. `.env` with the dadata token lives on the server in `/srv/prestige-logist`.
+The projects server from [infra-server](https://github.com/aimuzov/infra-server): merging the release PR that release-please keeps open runs `deploy.yml`, which runs the checks and logs in over SSH. There the key runs the shared [`deploy/site.sh`](https://github.com/aimuzov/infra-server/blob/main/deploy/site.sh) of infra-server, which pulls `main` and rebuilds two containers from [`deploy/docker-compose.yml`](deploy/docker-compose.yml): `prestige-logist` (nginx with the static site) and `prestige-logist-api`. The domain, TLS and the `/api` route are handled by the shared Caddy. `.env` with the dadata token lives on the server in `/srv/prestige-logist`.
 
 To roll back fast, run Deploy by hand with the previous tag: `gh workflow run deploy.yml -f tag=v1.2.3`. A fix of the bad commit goes out through the release PR like any change.
 
