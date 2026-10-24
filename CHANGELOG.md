@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.2](https://github.com/aimuzov/prestige-logist/compare/v1.3.1...v1.3.2) (2026-10-24)
+
+
+### Bug Fixes
+
+* **deps:** move to infra-site-kit v3 under the personal aimuzov account ([7432efe](https://github.com/aimuzov/prestige-logist/commit/7432efe3ae9933adb676b61a728e91938166b2b0))
+* **deps:** move to infra-site-kit v3 under the personal aimuzov account ([fde564b](https://github.com/aimuzov/prestige-logist/commit/fde564b49dc5a1a8a4e24415b51922fff37fff7d))
+
 ## [1.3.1](https://github.com/aimuzov-projects/prestige-logist/compare/v1.3.0...v1.3.1) (2026-10-20)
 
 
