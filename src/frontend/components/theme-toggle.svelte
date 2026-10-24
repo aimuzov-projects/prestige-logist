@@ -1,16 +1,10 @@
 <script lang="ts">
-	import '@aimuzov-projects/infra-site-kit/theme-peek.css'
+	import '@aimuzov/infra-site-kit/theme-peek.css'
 	import Moon from '@lucide/svelte/icons/moon'
 	import Sun from '@lucide/svelte/icons/sun'
 	import SunMoon from '@lucide/svelte/icons/sun-moon'
-	import {
-		nextTheme,
-		toggleTheme,
-		watchTheme,
-		type Scheme,
-		type Theme,
-	} from '@aimuzov-projects/infra-site-kit/theme.js'
-	import { themePeek } from '@aimuzov-projects/infra-site-kit/theme-peek.js'
+	import { nextTheme, toggleTheme, watchTheme, type Scheme, type Theme } from '@aimuzov/infra-site-kit/theme.js'
+	import { themePeek } from '@aimuzov/infra-site-kit/theme-peek.js'
 	import { onMount, tick } from 'svelte'
 
 	import Button from '#frontend/components/ui/button.svelte'

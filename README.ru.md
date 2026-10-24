@@ -8,12 +8,12 @@
 </p>
 
 <p align="center">
-	<a href="https://github.com/aimuzov-projects/prestige-logist/actions/workflows/deploy.yml"><img src="https://img.shields.io/github/actions/workflow/status/aimuzov-projects/prestige-logist/deploy.yml?branch=main&label=deploy" alt="Deploy"></a>
+	<a href="https://github.com/aimuzov/prestige-logist/actions/workflows/deploy.yml"><img src="https://img.shields.io/github/actions/workflow/status/aimuzov/prestige-logist/deploy.yml?branch=main&label=deploy" alt="Deploy"></a>
 	<a href="https://logist.aimuzov.online"><img src="https://img.shields.io/website?url=https%3A%2F%2Flogist.aimuzov.online&label=site" alt="Site status"></a>
-	<a href="package.json"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Faimuzov-projects%2Fprestige-logist%2Fmain%2Fpackage.json&query=%24.engines.node&label=node&logo=nodedotjs&logoColor=white&color=5fa04e" alt="Node"></a>
-	<a href="https://astro.build"><img src="https://img.shields.io/github/package-json/dependency-version/aimuzov-projects/prestige-logist/dev/astro?logo=astro&logoColor=white&color=bc52ee" alt="Astro"></a>
-	<a href="https://svelte.dev"><img src="https://img.shields.io/github/package-json/dependency-version/aimuzov-projects/prestige-logist/dev/svelte?logo=svelte&logoColor=white&color=ff3e00" alt="Svelte"></a>
-	<a href="LICENSE"><img src="https://img.shields.io/github/license/aimuzov-projects/prestige-logist" alt="License"></a>
+	<a href="package.json"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Faimuzov%2Fprestige-logist%2Fmain%2Fpackage.json&query=%24.engines.node&label=node&logo=nodedotjs&logoColor=white&color=5fa04e" alt="Node"></a>
+	<a href="https://astro.build"><img src="https://img.shields.io/github/package-json/dependency-version/aimuzov/prestige-logist/dev/astro?logo=astro&logoColor=white&color=bc52ee" alt="Astro"></a>
+	<a href="https://svelte.dev"><img src="https://img.shields.io/github/package-json/dependency-version/aimuzov/prestige-logist/dev/svelte?logo=svelte&logoColor=white&color=ff3e00" alt="Svelte"></a>
+	<a href="LICENSE"><img src="https://img.shields.io/github/license/aimuzov/prestige-logist" alt="License"></a>
 </p>
 
 <h3 align="center">Заявка перевозчику из поручения экспедитору</h3>
@@ -93,7 +93,7 @@
 
 ## Запуск
 
-Стек и раскладка как в [infra-site-template](https://github.com/aimuzov-projects/infra-site-template): Astro + Svelte 5, Prettier, oxlint, stylelint (БЭМ), `node --test`. Нужен Node 26.11.1, та же версия закреплена в `package.json` и в обоих Dockerfile.
+Стек и раскладка как в [infra-site-template](https://github.com/aimuzov/infra-site-template): Astro + Svelte 5, Prettier, oxlint, stylelint (БЭМ), `node --test`. Нужен Node 26.11.1, та же версия закреплена в `package.json` и в обоих Dockerfile.
 
 ```sh
 cp .env.example .env   # DADATA_TOKEN необязателен: без него адреса и перевозчик вводятся руками
@@ -110,7 +110,7 @@ npm run format:check && npm run lint:js && npm run lint:css && npm run check && 
 
 Тесты ядра (`node --test`) собирают заявку из синтетического поручения в [`src/backend/core/fixtures`](src/backend/core/fixtures) и проверяют кодировку, пояса и заглушки.
 
-E2E-тесты в [`e2e`](e2e) собирают сайт и открывают его в Chromium с общими проверками из [infra-site-kit](https://github.com/aimuzov-projects/infra-site-kit): страницы из sitemap отвечают без ошибок в консоли и проходят axe, кнопка темы переключает схему и показывает другую под кругом. Браузер ставится один раз через `npx playwright install chromium`, дальше `npm run test:e2e`.
+E2E-тесты в [`e2e`](e2e) собирают сайт и открывают его в Chromium с общими проверками из [infra-site-kit](https://github.com/aimuzov/infra-site-kit): страницы из sitemap отвечают без ошибок в консоли и проходят axe, кнопка темы переключает схему и показывает другую под кругом. Браузер ставится один раз через `npx playwright install chromium`, дальше `npm run test:e2e`.
 
 ## Content Security Policy
 
@@ -126,7 +126,7 @@ E2E-тесты в [`e2e`](e2e) собирают сайт и открывают �
 
 ## Выкладка
 
-Сервер projects из [infra-server](https://github.com/aimuzov-projects/infra-server): мерж релизного PR, который ведёт release-please, запускает `deploy.yml`, тот прогоняет проверки и заходит по SSH. Там ключ запускает общий [`deploy/site.sh`](https://github.com/aimuzov-projects/infra-server/blob/main/deploy/site.sh) из infra-server, который подтягивает `main` и пересобирает два контейнера из [`deploy/docker-compose.yml`](deploy/docker-compose.yml): `prestige-logist` (nginx со статикой) и `prestige-logist-api`. Домен, TLS и маршрут `/api` держит общий Caddy. `.env` с токеном dadata лежит на сервере в `/srv/prestige-logist`.
+Сервер projects из [infra-server](https://github.com/aimuzov/infra-server): мерж релизного PR, который ведёт release-please, запускает `deploy.yml`, тот прогоняет проверки и заходит по SSH. Там ключ запускает общий [`deploy/site.sh`](https://github.com/aimuzov/infra-server/blob/main/deploy/site.sh) из infra-server, который подтягивает `main` и пересобирает два контейнера из [`deploy/docker-compose.yml`](deploy/docker-compose.yml): `prestige-logist` (nginx со статикой) и `prestige-logist-api`. Домен, TLS и маршрут `/api` держит общий Caddy. `.env` с токеном dadata лежит на сервере в `/srv/prestige-logist`.
 
 Быстро откатиться — запустить Deploy вручную с прошлым тегом: `gh workflow run deploy.yml -f tag=v1.2.3`. Исправление плохого коммита выезжает через релизный PR, как любое изменение.
 
